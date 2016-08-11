@@ -1,0 +1,9 @@
+more /var/log/mongodb/mongod.log
+
+
+
+
+/mis_paginas_estaticas/hello_estatico.html
+NOTA: Quiza se pueda renderizar desde "views" sin parámetros
+
+
