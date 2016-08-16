@@ -6,14 +6,12 @@ exports.bulk_add = function (req, res) {
 	var MongoClient = mongodb.MongoClient;
 	var url = 'mongodb://localhost:27017/my_database_name';
 
-	var which = "";
-
 	MongoClient.connect(url, function (err, db) {
 		if (err) {
 			res.write('Unable to connect to the mongoDB server. Error: ' + err + "\n");
 			// console.log('Unable to connect to the mongoDB server. Error:', err);
 		} else {
-			res.write('Connection established to' + url + "\n");
+			res.write('Connection established to ' + url + "\n");
 			// console.log('Connection established to', url);
 
 			// Get the documents collection
@@ -31,15 +29,14 @@ exports.bulk_add = function (req, res) {
 					// console.log(err);
 				} else {
 					// obj_str = JSON.stringify(obj);
-					var cad = 'Inserted' + result.length +
-						'documents into the "users" collection. The documents inserted with "_id" are: ' + 
+					var cad = 'Inserted ' + result.length +
+						' documents into the "users" collection. The documents inserted with "_id" are: ' + 
 						JSON.stringify(result);
 
 					res.write(cad + "\n");
 					// console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
 				}
 				db.close();
-
 				res.end();
 			});
 		}
@@ -62,12 +59,44 @@ exports.bulk_add = function (req, res) {
 
 // GET - /users/raw_list
 exports.raw_users_list = function (req, res) {
-	
+	var mongodb = require('mongodb');
+	var MongoClient = mongodb.MongoClient;
+	var url = 'mongodb://localhost:27017/my_database_name';
 
+	MongoClient.connect(url, function (err, db) {
+		if (err) {
+			console.log('Unable to connect to the mongoDB server. Error:', err);
+			res.write('Unable to connect to the mongoDB server. Error: ' + err + "\n");
+		} else {
+			console.log('Connection established to', url);
+			res.write('Connection established to' + url + "\n");
 
+			var collection = db.collection('users');
 
-	res.write("Hola\nMundo");
-	res.end();
+			// All Elements
+			collection.find({}).toArray(function (err, result) {
+				if (err) {
+					console.log(err);
+					res.write(JSON.stringify(err));
+				} else if (result.length) {
+					console.log('Found:', result);
+					res.write("\nElements:\n\n");
+
+					for(pos in result) {
+						for (el in result[pos]) {
+							res.write("\t" + JSON.stringify(el) + " : " + JSON.stringify(result[pos][el]) + "\n");
+						}
+						res.write("\n");
+					}
+				} else {
+					console.log('No document(s) found with defined "find" criteria!');
+					res.write('No document(s) found with defined "find" criteria!');
+				}
+				db.close();
+				res.end();
+			});
+		}
+	});
 }
 
 
