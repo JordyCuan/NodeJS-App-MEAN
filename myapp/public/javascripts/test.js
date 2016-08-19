@@ -11,7 +11,7 @@
 
 
 	$("#bget").click(function() {
-		$.get("http://localhost:3000/rest", function(data, status){
+		$.get("/rest", function(data, status){
 			$('#res').text("Data: " + data + " - Status: " + status);
 			//alert("Data: " + data + " - Status: " + status);
 		});
@@ -27,7 +27,7 @@
 
 	$("#bput").click(function() {
 		$.ajax({
-		    url: 'http://localhost:3000/rest',
+		    url: '/rest',
 		    type: 'PUT',
 		    success: function(result) {
 		        $('#res').text("RESULT: " + result);

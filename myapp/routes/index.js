@@ -16,10 +16,10 @@ router.get('/users/bulk_add', controller.bulk_add);
 
 
 sleep = function (milliseconds) {
-  var start = new Date().getTime();
-  for (var i = 0; i < 10e7; i++) {
-    if ((new Date().getTime() - start) > milliseconds){
-      break;
+    var start = new Date().getTime();
+    for (var i = 0; i < 10e7; i++) {
+        if ((new Date().getTime() - start) > milliseconds){
+        break;
     }
   }
 }
@@ -39,9 +39,11 @@ router.delete('/rest', function (req, res) {
 });
 
 
+
+
 router.get('/archivo', function (req, res) {
 	console.log(__dirname);
-	fs.readFile('./public/mis_paginas_estaticas/hello_estatico.html',function (err, data) {
+	fs.readFile('./public/pages/hello_estatico.html',function (err, data) {
 		if (err) {
 			console.log(err);
 			res.writeHead(404, {'Content-Type': 'text/html'});
