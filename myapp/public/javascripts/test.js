@@ -18,10 +18,34 @@
 	});
 
 
+	simpleJSON = {	"request": {
+						"slice": [
+							{
+								"origin": "ZRH",
+								"destination": "DUS",
+								"date": "2014-12-02"
+							}
+						],
+						"passengers": {
+							"adultCount": 1,
+							"infantInLapCount": 0,
+							"infantInSeatCount": 0,
+							"childCount": 0,
+							"seniorCount": 0
+						},
+						"solutions": 20,
+						"refundable": false
+					}
+				};
+
+
 	$("#bpost").click(function() {
-		$.post("/rest", function(data, status){
-			$('#res').text("Data: " + data + " - Status: " + status);
-		});		
+		console.log(simpleJSON);
+		$.post(
+			"/rest", 
+			simpleJSON, 
+			function(data, status) {$('#res').text("Data: " + data + " - Status: " + status);}
+		);		
 	});
 
 

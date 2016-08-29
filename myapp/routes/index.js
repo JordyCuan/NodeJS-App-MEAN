@@ -8,10 +8,19 @@ router.get('/', function(req, res, next) {
 });
 
 
-var controller = require('../controllers/mis_controllers')
+var controller = require('../controllers/mis_controllers');
+var controladores = require('../controllers/controladores')
 
 router.get('/users/raw_list', controller.raw_users_list);
 router.get('/users/bulk_add', controller.bulk_add);
+
+
+
+
+router.post('/user/add', controladores.add);
+
+
+
 
 
 
@@ -25,12 +34,38 @@ sleep = function (milliseconds) {
 }
 
 
+
+
+//req.params	- /element/:id/
+//req.body		- /element/
+//req.query		- /element?id=valor
+
 router.get('/rest', function (req, res) {
-	res.send("Peticion GET");
+	res.write("Respuesta de Peticion GET\n");
+	params = req.query;
+
+	for (p in params) {
+		res.write(p + "\t\t" + params[p] + "\n");
+	}
+	res.end();
 });
+
+
 router.post('/rest', function (req, res) {
-	res.send("Peticion POST");
+	res.write("Respuesta de Peticion POST\n\n");
+	params = req.body;
+	console.log(req.body);
+	console.log('\n\n')
+	//console.log(req.body.request.slice[0].origin);
+
+	for (p in params) {
+		res.write(p + "\t\t" + params[p] + "\n");
+	}
+
+	res.end();
 });
+
+
 router.put('/rest', function (req, res) {
 	res.send("Peticion PUT");
 });

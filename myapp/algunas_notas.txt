@@ -7,3 +7,5 @@ more /var/log/mongodb/mongod.log
 NOTA: Quiza se pueda renderizar desde "views" sin parámetros
 
 
+
+/users/register
