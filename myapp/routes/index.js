@@ -18,6 +18,7 @@ router.get('/users/bulk_add', controller.bulk_add);
 
 
 router.post('/user/add', controladores.add);
+router.get('/user/list', controladores.user_list);
 
 
 
