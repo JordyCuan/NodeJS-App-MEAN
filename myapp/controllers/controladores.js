@@ -3,11 +3,6 @@ var User = require('../models/user');
 
 // POST - /user/add
 exports.add = function (req, res) {
-	//var mongodb = require('mongodb');
-	//var MongoClient = mongodb.MongoClient;
-	//var url = 'mongodb://localhost:27017/prefixa_db';  // TODO - Cambiar por algo mas apropiado
-	// 'mongodb://<dbuser>:<dbpassword>@<localhost>:27017/<dbName>'
-
 
 	name = req.body.name;
 	email = req.body.email;
@@ -53,44 +48,6 @@ exports.add = function (req, res) {
 	    }
 	    res.end(); // TODO - ¿DEBEMOS ENVIAR ALGO?
 	});
-	  
-
-/*
-	MongoClient.connect(url, function (err, db) {
-		if (err) {
-			console.log('Unable to connect to the mongoDB server. Error:', err);
-		} else {
-			console.log('Connection established to', url);
-
-			// Get the documents collection
-			var collection = db.collection('prefixa_users');
-
-			// Set the email as our id
-			collection.createIndex( { _email : 1}, { unique: true } );
-
-			//Create the object
-			var user = {
-				_name: name, 
-				_email: email, 
-				_password: password
-			};
-
-			// Insert
-			collection.insert(user, function (err, result) {
-				if (err) {
-					console.log(err);
-					//res.write(err.errmsg);
-					res.write("El correo ya está en uso");
-				} else {
-					console.log('Inserted %d documents into the "users" collection. The documents inserted with "_id" are:', result.length, result);
-					console.log("*** Inserted! ***");
-					res.write("Added");
-				}
-				db.close();
-				res.end();  // TODO - ¿DEBEMOS ENVIAR ALGO?
-			});
-		}
-	});*/
 }
 
 
@@ -99,11 +56,6 @@ exports.add = function (req, res) {
 
 // GET - /user/list
 exports.user_list = function (req, res) {
-	var mongodb = require('mongodb');
-	var MongoClient = mongodb.MongoClient;
-	var url = 'mongodb://localhost:27017/prefixa_db'; 
-
-
 
 	User.find( {} , function (err, userObj) {
 	    if (err) {
@@ -123,12 +75,6 @@ exports.user_list = function (req, res) {
 					console.log('Found:', result);
 					res.write("\nElements:\n\n");
 
-					/*for(pos in result) {
-						for (el in result[pos]) {
-							//res.write("\t" + JSON.stringify(el) + " : " + JSON.stringify(result[pos][el]) + "\n");
-						}
-						res.write("\n");
-					}*/
 					for(pos in result) {
 						for (el in pos) {
 							res.write("\t" + JSON.stringify(pos) + " : " + JSON.stringify(result[pos]) + "\n");
@@ -143,39 +89,4 @@ exports.user_list = function (req, res) {
 			});
 		}
 	});
-/*
-	MongoClient.connect(url, function (err, db) {
-		if (err) {
-			console.log('Unable to connect to the mongoDB server. Error:', err);
-			res.write('Unable to connect to the mongoDB server. Error: ' + err + "\n");
-		} else {
-			console.log('Connection established to', url);
-			res.write('Connection established to' + url + "\n");
-
-			var collection = db.collection('prefixa_users');
-
-			// All Elements
-			collection.find({}).toArray(function (err, result) {
-				if (err) {
-					console.log(err);
-					res.write(JSON.stringify(err));
-				} else if (result.length) {
-					console.log('Found:', result);
-					res.write("\nElements:\n\n");
-
-					for(pos in result) {
-						for (el in result[pos]) {
-							res.write("\t" + JSON.stringify(el) + " : " + JSON.stringify(result[pos][el]) + "\n");
-						}
-						res.write("\n");
-					}
-				} else {
-					console.log('No document(s) found with defined "find" criteria!');
-					res.write('No document(s) found with defined "find" criteria!');
-				}
-				db.close();
-				res.end();
-			});
-		}
-	});*/
 }

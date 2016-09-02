@@ -9,3 +9,8 @@ NOTA: Quiza se pueda renderizar desde "views" sin parámetros
 
 
 /users/register
+
+
+
+
+https://github.com/tutsplus/passport-mongo/blob/master/passport/signup.js

@@ -2,6 +2,11 @@ var LocalStrategy   = require('passport-local').Strategy;
 var User = require('../models/user');
 var bCrypt = require('bcrypt-nodejs');
 
+
+
+// TODO - Conflicto entre Username y User
+
+
 module.exports = function(passport){
 
 	passport.use('login', new LocalStrategy({
@@ -9,7 +14,7 @@ module.exports = function(passport){
         },
         function(req, username, password, done) { 
             // check in mongo if a user with username exists or not
-            User.findOne({ 'username' :  username }, 
+            User.findOne({ '_name' :  username }, 
                 function(err, user) {
                     // In case of any error, return using the done method
                     if (err)
