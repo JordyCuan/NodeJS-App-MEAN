@@ -119,7 +119,7 @@ var passport = require('passport');
 /* GET login page. */
 router.get('/login', function(req, res) {
 	// Display the Login page with any flash message, if any
-	res.render('login', { /*message: req.flash('message')*/ });
+	res.render('login', { message: req.flash('Revisa los campos y vuelve a intentarlo') });
 });
 
 /* Handle Login POST */
@@ -157,6 +157,7 @@ router.get('/signout', function(req, res) {
 // ******* Esta es una pagina protegida ********
 /* GET Home Page */
 router.get('/home', isAuthenticated, function(req, res){
+	console.log(req.user)
 	res.render('home', { user: req.user });
 });
 

@@ -10,13 +10,15 @@ var bCrypt = require('bcrypt-nodejs');
 module.exports = function(passport){
 
 	passport.use('signup', new LocalStrategy({
-            passReqToCallback : true // allows us to pass back the entire request to the callback
+            passReqToCallback : true,  // allows us to pass back the entire request to the callback
+            usernameField: 'email',
+            passwordField: 'password'
         },
         function(req, username, password, done) {
 
             findOrCreateUser = function(){
                 // find a user in Mongo with provided username
-                User.findOne({ '_name' :  username }, function(err, user) {
+                User.findOne({ '_email' :  username }, function(err, user) {
                     // In case of any error, return using the done method
                     if (err){
                         console.log('Error in SignUp: '+err);
@@ -34,11 +36,11 @@ module.exports = function(passport){
 
                         // TODO - Como guardarlo?
                         // set the user's local credentials
-                        newUser.username = username;
-                        newUser.password = createHash(password);
-                        newUser.email = req.param('email');
-                        newUser.firstName = req.param('firstName');
-                        newUser.lastName = req.param('lastName');
+                        newUser._name = req.param('name');
+                        newUser._password = createHash(password);
+                        newUser._email = username
+
+
 
                         // save the user
                         newUser.save(function(err) {

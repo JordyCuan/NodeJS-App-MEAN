@@ -10,17 +10,20 @@ var bCrypt = require('bcrypt-nodejs');
 module.exports = function(passport){
 
 	passport.use('login', new LocalStrategy({
-            passReqToCallback : true
+            passReqToCallback : true,
+            usernameField: 'email',
+            passwordField: 'password'
         },
         function(req, username, password, done) { 
             // check in mongo if a user with username exists or not
-            User.findOne({ '_name' :  username }, 
+            User.findOne({ '_email' :  username }, 
                 function(err, user) {
                     // In case of any error, return using the done method
                     if (err)
                         return done(err);
                     // Username does not exist, log the error and redirect back
                     if (!user){
+                        // TODO - Cambiar este mensaje
                         console.log('User Not Found with username '+username);
                         return done(null, false, req.flash('message', 'User Not found.'));                 
                     }
@@ -40,7 +43,7 @@ module.exports = function(passport){
 
 
     var isValidPassword = function(user, password){
-        return bCrypt.compareSync(password, user.password);
+        return bCrypt.compareSync(password, user._password);
     }
     
 }
