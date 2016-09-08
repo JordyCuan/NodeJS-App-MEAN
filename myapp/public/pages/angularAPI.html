@@ -26,17 +26,17 @@
 		<script type="text/javascript">
 			var app = angular.module('myApp', []);
 			app.controller('myCtrl', function($scope, $http) {
-				$http({
-					method : "GET",
-					url : "/json"
-				}).then( 
-					function mySucces(response) {
-						$scope.characters = response.data;
-					}, 
-					function myError(response) {
-						$scope.characters = response.statusText;
-					}
-				);
+			    $scope.cargar = function($html) {
+					$http.get("/json")
+					.then( 
+						function mySucces(response) {
+							$scope.characters = response.data;
+						}, 
+						function myError(response) {
+							$scope.characters = response.statusText;
+						}
+					);
+    			};
 			});
 		</script>
 
@@ -51,8 +51,8 @@
 		<!--Esta extensión nos ayudará a manejar de forma sencilla las llamadas al API -->
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular-resource.min.js"></script>
 	</head>
-	<body>
-		<table id="breakingBadChar" ng-controller="myCtrl" style="width:100%">
+	<body ng-controller="myCtrl">
+		<table id="breakingBadChar" style="width:100%">
 			<!-- ng-controller define qué controlador se encargará de manejar la tabla-->
 			<thead>
 				<tr>
@@ -70,6 +70,6 @@
 			</tbody>
 		</table>
 
-		
+		<br><br><button ng-click="cargar()">Llenar tabla dinamicamente</button>
 	</body>
 </html>
