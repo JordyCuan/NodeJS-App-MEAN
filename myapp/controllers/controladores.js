@@ -62,10 +62,6 @@ exports.user_list = function (req, res) {
 			console.log('Unable to connect to the mongoDB server. Error:', err);
 			res.write('Unable to connect to the mongoDB server. Error: ' + err + "\n");
 		} else {
-			console.log('Connection established to', url);
-			res.write('Connection established to' + url + "\n");
-
-
 			// All Elements
 			User.find({}, function(err, result) {
 				if (err) {

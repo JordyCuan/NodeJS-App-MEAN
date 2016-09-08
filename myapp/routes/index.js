@@ -147,6 +147,28 @@ router.get('/angular2', isAuthenticated, function (req, res) {
 
 
 
+router.get('/angularJSON', isAuthenticated, function (req, res) {
+	console.log(__dirname);
+	fs.readFile('./public/pages/angularAPI.html',function (err, data) {
+		if (err) {
+			console.log(err);
+			res.writeHead(404, {'Content-Type': 'text/html'});
+		}else{   
+			res.writeHead(200, {'Content-Type': 'text/html'});  
+			res.write(data.toString());    
+		}
+		res.end();
+	}); 
+});
+
+
+router.get('/json', function (req, res) {
+	obj = [ {"id": 1,"name": "Walter", "surname": "White"},  {"id": 2,"name": "Jesse", "surname": "Pinkman"} ]
+	res.json(obj);
+});
+
+
+
 
 
 
