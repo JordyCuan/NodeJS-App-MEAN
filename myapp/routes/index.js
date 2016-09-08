@@ -147,7 +147,7 @@ router.get('/angular2', isAuthenticated, function (req, res) {
 
 
 
-router.get('/angularJSON', isAuthenticated, function (req, res) {
+router.get('/angularJSON', function (req, res) {
 	console.log(__dirname);
 	fs.readFile('./public/pages/angularAPI.html',function (err, data) {
 		if (err) {
@@ -163,7 +163,8 @@ router.get('/angularJSON', isAuthenticated, function (req, res) {
 
 
 router.get('/json', function (req, res) {
-	obj = [ {"id": 1,"name": "Walter", "surname": "White"},  {"id": 2,"name": "Jesse", "surname": "Pinkman"} ]
+	obj = [ {"id": 1,"name": "Walter", "surname": "White"},  {"id": 2,"name": "Jesse", "surname": "Pinkman"},
+			{"id": 3,"name": "Jordy", "surname": "Cuan"},  {"id": 4,"name": "Pedro", "surname": "Pérez"} ]
 	res.json(obj);
 });
 
