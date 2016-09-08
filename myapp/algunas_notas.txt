@@ -14,3 +14,23 @@ NOTA: Quiza se pueda renderizar desde "views" sin parámetros
 
 
 https://github.com/tutsplus/passport-mongo/blob/master/passport/signup.js
+
+
+
+**Authentication
+
+-- http://code.tutsplus.com/tutorials/authenticating-nodejs-applications-with-passport--cms-21619
+
+https://hackhands.com/mongodb-crud-mvc-way-with-passport-authentication/
+
+
+
+
+SOBRE ANGULAR
+
+Usar angular reducir el código del servidor
+
+Angular sirve para diseño de SPA (single-page application)
+
+Se puede usar AngularJS dentro de los templates (JADE / EJS), o bien, no usar templates y desde NodeJS devolver páginas estáticas
+

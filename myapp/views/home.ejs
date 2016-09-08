@@ -19,15 +19,13 @@
                     <div id="user">
                         <h1 class="text-center login-title">
 
-                        Pagina Protegida por Autentificación<br>
+                        Pagina Protegida por Autentificación<br><br>
 
-                            Welcome ___________. Check your details below:
+                            Welcome. Check your details below:
                             <div class="signup-wall">
                                 <ul class="user-details">
-                                    <li>Username ---&gt; _____________</li>
-                                    <li>Email    ---&gt; _____________</li>
-                                    <li>First Name ---&gt; _____________</li>
-                                    <li>Last Name ---&gt; _____________</li>
+                                    <li>Name       ---&gt; <%= user._name %></li>
+                                    <li>Email      ---&gt; <%= user._email %></li>
                                 </ul>
                             </div>
                             <a href="http://localhost:3000/signout" class="text-center new-account">Sign Out</a>

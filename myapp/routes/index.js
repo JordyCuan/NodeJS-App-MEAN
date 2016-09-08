@@ -3,6 +3,33 @@ var router = express.Router();
 var fs = require('fs');
 
 
+// AUTENTICACION CON PASSPORT
+var isAuthenticated = function (req, res, next) {
+	// if user is authenticated in the session, call the next() to call the next request handler 
+	// Passport adds this method to request object. A middleware is allowed to add properties to
+	// request and response objects
+	if (req.isAuthenticated())
+		return next();
+
+	// if the user is not authenticated then redirect him to the login page
+	res.redirect('/login');
+}
+
+
+
+
+sleep = function (milliseconds) {
+    var start = new Date().getTime();
+    for (var i = 0; i < 10e7; i++) {
+        if ((new Date().getTime() - start) > milliseconds){
+        break;
+    }
+  }
+}
+
+
+
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -24,17 +51,6 @@ router.get('/user/list', controladores.user_list);
 
 
 
-
-
-
-sleep = function (milliseconds) {
-    var start = new Date().getTime();
-    for (var i = 0; i < 10e7; i++) {
-        if ((new Date().getTime() - start) > milliseconds){
-        break;
-    }
-  }
-}
 
 
 
@@ -79,9 +95,45 @@ router.delete('/rest', function (req, res) {
 
 
 
+/************************************************************************************************/
+/************************************************************************************************/
+//     PAGINAS ESTÁTICAS
+/************************************************************************************************/
+/************************************************************************************************/
+
 router.get('/archivo', function (req, res) {
 	console.log(__dirname);
 	fs.readFile('./public/pages/hello_estatico.html',function (err, data) {
+		if (err) {
+			console.log(err);
+			res.writeHead(404, {'Content-Type': 'text/html'});
+		}else{   
+			res.writeHead(200, {'Content-Type': 'text/html'});  
+			res.write(data.toString());    
+		}
+		res.end();
+	}); 
+});
+
+
+router.get('/angular', isAuthenticated, function (req, res) {
+	console.log(__dirname);
+	fs.readFile('./public/pages/angular.html',function (err, data) {
+		if (err) {
+			console.log(err);
+			res.writeHead(404, {'Content-Type': 'text/html'});
+		}else{   
+			res.writeHead(200, {'Content-Type': 'text/html'});  
+			res.write(data.toString());    
+		}
+		res.end();
+	}); 
+});
+
+
+router.get('/angular2', isAuthenticated, function (req, res) {
+	console.log(__dirname);
+	fs.readFile('./public/pages/angular2.html',function (err, data) {
 		if (err) {
 			console.log(err);
 			res.writeHead(404, {'Content-Type': 'text/html'});
@@ -98,22 +150,13 @@ router.get('/archivo', function (req, res) {
 
 
 
-// AUTENTICACION CON PASSPORT
-var isAuthenticated = function (req, res, next) {
-	// if user is authenticated in the session, call the next() to call the next request handler 
-	// Passport adds this method to request object. A middleware is allowed to add properties to
-	// request and response objects
-	if (req.isAuthenticated())
-		return next();
-	// if the user is not authenticated then redirect him to the login page
-	res.redirect('/');
-}
 
 
-
-
-
-// TODO - Checar bien las rutas
+/************************************************************************************************/
+/************************************************************************************************/
+//     PASSPORT
+/************************************************************************************************/
+/************************************************************************************************/
 var passport = require('passport');
 
 /* GET login page. */
@@ -160,8 +203,6 @@ router.get('/home', isAuthenticated, function(req, res){
 	console.log(req.user)
 	res.render('home', { user: req.user });
 });
-
-
 
 
 

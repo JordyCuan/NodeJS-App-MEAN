@@ -3,10 +3,6 @@ var User = require('../models/user');
 var bCrypt = require('bcrypt-nodejs');
 
 
-
-// TODO - Conflicto entre Username y User Y VALIDACION DE EMAIL
-
-
 module.exports = function(passport){
 
 	passport.use('signup', new LocalStrategy({
@@ -64,5 +60,4 @@ module.exports = function(passport){
     var createHash = function(password){
         return bCrypt.hashSync(password, bCrypt.genSaltSync(10), null);
     }
-
 }

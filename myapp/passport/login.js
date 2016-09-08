@@ -3,10 +3,6 @@ var User = require('../models/user');
 var bCrypt = require('bcrypt-nodejs');
 
 
-
-// TODO - Conflicto entre Username y User
-
-
 module.exports = function(passport){
 
 	passport.use('login', new LocalStrategy({
@@ -45,5 +41,4 @@ module.exports = function(passport){
     var isValidPassword = function(user, password){
         return bCrypt.compareSync(password, user._password);
     }
-    
 }
