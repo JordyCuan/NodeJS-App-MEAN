@@ -1,4 +1,6 @@
 var User = require('../models/user');
+var Obj  = require('../models/archivos_obj');
+
 
 
 // POST - /user/add
@@ -53,7 +55,6 @@ exports.add = function (req, res) {
 
 
 
-
 // GET - /user/list
 exports.user_list = function (req, res) {
 
@@ -71,6 +72,7 @@ exports.user_list = function (req, res) {
 					console.log('Found:', result);
 					res.write("\nElements:\n\n");
 
+					// TODO - Aquí debería de devolverse un JSON no el JSON traducido. Además, no veo sentido de exponer esta ruta
 					for(pos in result) {
 						for (el in pos) {
 							res.write("\t" + JSON.stringify(pos) + " : " + JSON.stringify(result[pos]) + "\n");
@@ -85,4 +87,51 @@ exports.user_list = function (req, res) {
 			});
 		}
 	});
+}
+
+
+
+
+// POST - /upload
+exports.upload_file = function function_name(req, res) {
+	console.log(req.file);
+
+	// El archivo ya ha sido guardado por Multer
+	// ahora lo metemos a la DB
+	var obj1 = new Obj({
+						_originalname: req.file.originalname, 
+						_localname: req.file.filename, 
+						_path_and_name: req.file.path,
+						_path: req.file.destination
+					}
+	);
+	
+
+	// Guardamos el OBJ dentro de la base de datos
+	obj1.save(function (err, obj) {
+	    if (err) {
+	        console.log(err);
+	        res.write(err.errmsg);
+	    } else {
+	        console.log('saved successfully:', obj);
+	        res.write("Added OBJ***");
+
+	        // Se asocia el OBJ con el usuario que lo subio
+	        User.findOne( { _id : req.user._id } , function(err, result) {
+	        	if (err) {
+					console.log(err);
+					res.write(JSON.stringify(err));
+				}
+				else {
+					result._objs.push( obj1._id );
+					result.markModified('_objs');
+    				result.save(); 
+    				
+					//res.redirect("back");
+					res.write(JSON.stringify(obj1));
+					res.end();
+				}
+	        });
+	    }
+	});	
 }

@@ -1,39 +1,42 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-        <title></title>
-        <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<title></title>
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
-        <!-- Optional theme -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+		<!-- Optional theme -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
-        <!-- Latest compiled and minified JavaScript -->
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    </head>
-    <body>
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-6 col-md-4 col-md-offset-4">
-                    <div id="user">
-                        <h1 class="text-center login-title">
+		<!-- Latest compiled and minified JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-6 col-md-4 col-md-offset-4">
+					<div id="user">
+						
+						Pagina Protegida por Autentificación<br><br>
 
-                        Pagina Protegida por Autentificación<br><br>
+						Welcome. Check your details below:
+						<div class="signup-wall">
+							<ul class="user-details">
+								<li>Name       ---&gt; <%= user._name %></li>
+								<li>Email      ---&gt; <%= user._email %></li>
+							</ul>
 
-                            Welcome. Check your details below:
-                            <div class="signup-wall">
-                                <ul class="user-details">
-                                    <li>Name       ---&gt; <%= user._name %></li>
-                                    <li>Email      ---&gt; <%= user._email %></li>
-                                </ul>
-                            </div>
-                            <a href="http://localhost:3000/signout" class="text-center new-account">Sign Out</a>
-                        </h1>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </body>
+							<form action="/upload" method="POST" enctype="multipart/form-data">
+								<input type="file" name="obj">
+								<input type="submit" value="Subir archivo">
+							</form>
+						</div>
+						<a href="/signout" class="text-center new-account">Sign Out</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
 </html>
 

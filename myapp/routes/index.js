@@ -2,6 +2,19 @@ var express = require('express');
 var router = express.Router();
 var fs = require('fs');
 
+var multer  = require('multer');
+var upload = multer(
+	{ 
+		dest: 'uploads/',
+		limits: {
+  			fieldNameSize: 100,
+  			fieldSize: 10
+  		}
+   	}
+);
+
+
+
 
 // AUTENTICACION CON PASSPORT
 var isAuthenticated = function (req, res, next) {
@@ -14,8 +27,6 @@ var isAuthenticated = function (req, res, next) {
 	// if the user is not authenticated then redirect him to the login page
 	res.redirect('/login');
 }
-
-
 
 
 sleep = function (milliseconds) {
@@ -48,6 +59,15 @@ router.get('/users/bulk_add', controller.bulk_add);
 
 router.post('/user/add', controladores.add);
 router.get('/user/list', controladores.user_list);
+
+
+
+
+
+// POST Subir archivo
+router.use("/upload", isAuthenticated);
+router.use("/upload", upload.single("obj"));
+router.post('/upload', controladores.upload_file);
 
 
 

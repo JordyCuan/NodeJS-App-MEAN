@@ -1,9 +1,0 @@
-node_modules
-npm-debug.log
-.bash_history
-.idea
-.ssh
-./.ssh
-.ssh/*
-.cache/*
-.cache
