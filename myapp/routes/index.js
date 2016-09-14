@@ -47,11 +47,7 @@ router.get('/', function(req, res, next) {
 });
 
 
-//var controller = require('../controllers/mis_controllers');
 var controladores = require('../controllers/controladores')
-
-//router.get('/users/raw_list', controller.raw_users_list);
-//router.get('/users/bulk_add', controller.bulk_add);
 
 
 router.post('/user/add', controladores.add);
@@ -70,6 +66,31 @@ router.use("/upload", upload.single("obj"));
 router.post('/upload', controladores.upload_file);
 
 
+// Calling a binary
+router.get("/binary", function (req, res) {
+	const spawn = require('child_process').spawn;
+	const comando = spawn('ls', ['-lh', '/usr']);
+
+	comando.stdout.setEncoding('utf8');
+	comando.stderr.setEncoding('utf8');
+
+	comando.stdout.on('data', (data) => {
+		console.log("stdout: ${data}");
+		res.write("\n\nstdout: " + data);
+	});
+
+	comando.stderr.on('data', (data) => {
+		console.log("stderr: ${data}");
+		res.write("\n\nstderr: " + JSON.stringify(data));
+	});
+
+	comando.on('close', (code) => {
+		console.log("child process exited with code ${code}");
+		res.write("\n\nchild process exited with code " + JSON.stringify(code));
+
+		res.end();
+	});
+});
 
 
 
