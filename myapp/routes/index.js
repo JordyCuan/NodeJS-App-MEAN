@@ -17,15 +17,14 @@ var upload = multer(
 
 
 // AUTENTICACION CON PASSPORT
-var isAuthenticated = function (req, res, next) {
-	// if user is authenticated in the session, call the next() to call the next request handler 
+var isAuthenticated = function (req, res, next) {// if user is authenticated in the session, call the next() to call the next request handler 
 	// Passport adds this method to request object. A middleware is allowed to add properties to
 	// request and response objects
 	if (req.isAuthenticated())
 		return next();
 
 	// if the user is not authenticated then redirect him to the login page
-	res.redirect('/login');
+	res.redirect('/login'); // TODO - Si va a ser un servicio web, se deberían de settear errores y mensajes aquí.
 }
 
 
@@ -48,20 +47,21 @@ router.get('/', function(req, res, next) {
 });
 
 
-var controller = require('../controllers/mis_controllers');
+//var controller = require('../controllers/mis_controllers');
 var controladores = require('../controllers/controladores')
 
-router.get('/users/raw_list', controller.raw_users_list);
-router.get('/users/bulk_add', controller.bulk_add);
-
-
+//router.get('/users/raw_list', controller.raw_users_list);
+//router.get('/users/bulk_add', controller.bulk_add);
 
 
 router.post('/user/add', controladores.add);
 router.get('/user/list', controladores.user_list);
 
 
-
+// Archivos por usuario
+router.get('/user/files', isAuthenticated, function (req, res) {
+	res.json(req.user._objs); // Devolver sus archivos asociados
+});
 
 
 // POST Subir archivo
