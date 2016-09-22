@@ -3,14 +3,34 @@ var router = express.Router();
 var fs = require('fs');
 
 var multer  = require('multer');
+
+var storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+		console.log('*-*-*-*-*-*-*-*-*',__dirname,req.user._email);
+
+		var newDestination = 'uploads/' + req.user._email;
+		var stat = null;
+		try {
+			stat = fs.statSync(newDestination);
+		} catch (err) {
+			fs.mkdirSync(newDestination);
+		}
+		if (stat && !stat.isDirectory()) {
+			throw new Error('---Directory cannot be created because an inode of a different type exists at "' + dest + '"');
+		}		
+		cb(null, newDestination);
+	}
+});
+
 var upload = multer(
 	{ 
 		dest: 'uploads/',
 		limits: {
-  			fieldNameSize: 100,
-  			fieldSize: 10
-  		}
-   	}
+			fieldNameSize: 100,
+			fileSize: 60000000
+		},
+		storage: storage
+	}
 );
 
 
@@ -29,11 +49,11 @@ var isAuthenticated = function (req, res, next) {// if user is authenticated in 
 
 
 sleep = function (milliseconds) {
-    var start = new Date().getTime();
-    for (var i = 0; i < 10e7; i++) {
-        if ((new Date().getTime() - start) > milliseconds){
-        break;
-    }
+	var start = new Date().getTime();
+	for (var i = 0; i < 10e7; i++) {
+		if ((new Date().getTime() - start) > milliseconds){
+			break;
+	}
   }
 }
 
@@ -63,7 +83,32 @@ router.get('/user/files', isAuthenticated, function (req, res) {
 // POST Subir archivo
 router.use("/upload", isAuthenticated);
 router.use("/upload", upload.single("obj"));
+//router.post('/upload', controladores.upload_file);
+/*router.use('/upload', 
+	multer({
+		dest: './uploads/',
+		limits: { fieldNameSize: 100, fileSize: 60000000 },
+		changeDest: function(dest, req, res) {
+			console.log('*-*-*-*-*-*-*-*-*-*-*-*-*-*-*',__dirname, dest + req.user._email);
+			var newDestination = dest + req.user._email;
+			var stat = null;
+			try {
+				stat = fs.statSync(newDestination);
+			} catch (err) {
+				fs.mkdirSync(newDestination);
+			}
+			if (stat && !stat.isDirectory()) {
+				throw new Error('Directory cannot be created because an inode of a different type exists at "' + dest + '"');
+			}
+			return newDestination
+		}
+	}).single("obj")
+);*/
 router.post('/upload', controladores.upload_file);
+// https://github.com/expressjs/multer/issues/58#issuecomment-75315556
+// http://stackoverflow.com/questions/25698176/how-to-set-different-destinations-in-nodejs-using-multer
+
+
 
 
 // Calling a binary
@@ -75,22 +120,62 @@ router.get("/binary", function (req, res) {
 	comando.stderr.setEncoding('utf8');
 
 	comando.stdout.on('data', (data) => {
-		console.log("stdout: ${data}");
+		console.log(`stdout: ${data}`);
 		res.write("\n\nstdout: " + data);
 	});
 
 	comando.stderr.on('data', (data) => {
-		console.log("stderr: ${data}");
+		console.log(`stderr: ${data}`);
 		res.write("\n\nstderr: " + JSON.stringify(data));
 	});
 
 	comando.on('close', (code) => {
-		console.log("child process exited with code ${code}");
+		console.log(`child process exited with code ${code}`);
 		res.write("\n\nchild process exited with code " + JSON.stringify(code));
 
 		res.end();
 	});
 });
+
+
+
+
+router.get('/fileobj', function (req, res) {
+	var uploads = "/home/jordy/node_projects/myapp/uploads/";
+	var _email  = "jordy@hotmail.com";
+	var _obj    = "city.obj"
+
+	console.log(__dirname);
+  	//var fileName = "/home/jordy/node_projects/myapp/uploads/jordy@hotmail.com/city.obj";
+	var fileName = uploads + _email + "/" + _obj;
+
+
+	var options = {
+    	headers: {
+        	'x-timestamp': Date.now(),
+        	'x-sent': true,
+        	'mimetype': "application/octet-stream",
+        	'Content-Type' : "application/octet-stream"
+    	}
+  	};
+
+	console.log(fileName);
+  	res.sendFile(fileName, options, function (err) {
+    	if (err) {
+      		console.log(err);
+      		res.status(err.status).end();
+    	}
+    	else {
+      		console.log('Sent:', fileName);
+    	}
+  	});
+});
+
+
+
+
+
+
 
 
 
@@ -111,17 +196,29 @@ router.get('/rest', function (req, res) {
 });
 
 
-router.post('/rest', function (req, res) {
-	res.write("Respuesta de Peticion POST\n\n");
-	params = req.body;
-	console.log(req.body);
-	console.log('\n\n')
-	//console.log(req.body.request.slice[0].origin);
-
-	for (p in params) {
-		res.write(p + "\t\t" + params[p] + "\n");
+router.post('/rest', multer(
+	{ 
+		dest: 'uploads/',
+		limits: {
+			fieldNameSize: 100,
+			fileSize: 60000000
+		}
+	}).single("obj"), function (req, res) {
+	if (req.file) {
+		res.json(req.file);
+		console.log(req.file);
 	}
+	else {
+		res.write("Respuesta de Peticion POST\n\n");
+		params = req.body;
+		console.log(req.body);
+		console.log('\n\n')
+		//console.log(req.body.request.slice[0].origin);
 
+		for (p in params) {
+			res.write(p + "\t\t" + params[p] + "\n");
+		}
+	}
 	res.end();
 });
 
@@ -141,6 +238,35 @@ router.delete('/rest', function (req, res) {
 //     PAGINAS ESTÁTICAS
 /************************************************************************************************/
 /************************************************************************************************/
+router.get("/uploadfile", function(req, res) {
+	console.log(__dirname);
+	fs.readFile('./public/pages/UploadFile.html',function (err, data) {
+		if (err) {
+			console.log(err);
+			res.writeHead(404, {'Content-Type': 'text/html'});
+		}else{   
+			res.writeHead(200, {'Content-Type': 'text/html'});  
+			res.write(data.toString());    
+		}
+		res.end();
+	}); 	
+});
+
+
+router.get("/uploadfile-js", function(req, res) {
+	console.log(__dirname);
+	fs.readFile('./public/pages/UploadFile-JS.html',function (err, data) {
+		if (err) {
+			console.log(err);
+			res.writeHead(404, {'Content-Type': 'text/html'});
+		}else{   
+			res.writeHead(200, {'Content-Type': 'text/html'});  
+			res.write(data.toString());    
+		}
+		res.end();
+	}); 	
+});
+
 
 router.get('/archivo', function (req, res) {
 	console.log(__dirname);

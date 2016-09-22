@@ -3,25 +3,13 @@ more /var/log/mongodb/mongod.log
 
 
 
-/mis_paginas_estaticas/hello_estatico.html
-NOTA: Quiza se pueda renderizar desde "views" sin parámetros
-
-
-
-/users/register
-
-
-
-
-https://github.com/tutsplus/passport-mongo/blob/master/passport/signup.js
-
-
-
 **Authentication
 
 -- http://code.tutsplus.com/tutorials/authenticating-nodejs-applications-with-passport--cms-21619
 
 https://hackhands.com/mongodb-crud-mvc-way-with-passport-authentication/
+
+https://github.com/tutsplus/passport-mongo/blob/master/passport/signup.js
 
 
 
@@ -54,3 +42,17 @@ http://jasonwatmore.com/post/2015/03/10/AngularJS-User-Registration-and-Login-Ex
 SUBIR ARCHIVOS AL SERVER:
 
 https://github.com/expressjs/multer
+
+
+
+Ejecutar binarios en NodeJS
+
+https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options
+
+https://nodejs.org/api/child_process.html#child_process_class_childprocess
+
+
+
+REGRESAR ARCHIVOS AL NAVEGADOR
+
+http://expressjs.com/en/api.html#res.sendFile

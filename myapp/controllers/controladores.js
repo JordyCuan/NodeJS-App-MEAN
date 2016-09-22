@@ -102,7 +102,10 @@ exports.upload_file = function function_name(req, res) {
 						_originalname: req.file.originalname, 
 						_localname: req.file.filename, 
 						_path_and_name: req.file.path,
-						_path: req.file.destination
+						_path: req.file.destination,
+						_encoding: req.file.encoding,
+    					_mimetype: req.file.mimetype,
+    					_size: req.file.size
 					}
 	);
 	
