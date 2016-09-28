@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload de archivos con Ajax</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+    <script src="http://threejs.org/build/three.min.js"></script>
+    <script src="http://threejs.org/examples/js/loaders/OBJLoader.js"></script>
+    <script src="http://threejs.org/examples/js/Detector.js"></script>
+    <script src="http://threejs.org/examples/js/libs/stats.min.js"></script>
+
+</head>
+<body>
+<!-- SHOW PROGRESS UPLOAD -->
+<!-- SHOW RENDER 3D -->
+    <form method="POST" enctype="multipart/form-data" name="fileinfo" >
+      <input type="file" name="obj" id="obj">
+      <input type="submit" value="Subir archivo">
+    </form>
+    <div id="mensaje"></div>
+    <p id="percentage"></p>
+
+    <div>
+       <input type="button"  value="VER RENDER" onclick="visualizeObj()">
+     </div>
+
+
+    <script type="text/javascript">
+
+    //UPLOAD FILE WITH JUST JS AND XHR
+    var form = document.forms.namedItem("fileinfo");
+    form.addEventListener('submit', function(ev) {
+      var msg = document.getElementById("mensaje"),
+      formData = new FormData(document.forms.namedItem("fileinfo"));
+      var xhr = new XMLHttpRequest();
+      xhr.upload.onprogress = updateProgress;
+      xhr.open("POST", "/rest", true);
+      xhr.onload = function() 
+      {
+        if (xhr.status == 200) {
+            msg.innerHTML = xhr.responseText;
+        } 
+        else {
+            msg.innerHTML = xhr.responseText;
+        } 
+      };
+      xhr.send(formData);
+      ev.preventDefault();
+    }, false);
+
+    function updateProgress(evt) {
+      if (evt.lengthComputable)
+      {
+          var percentComplete = evt.loaded / evt.total;
+          percentComplete = Math.round( percentComplete*100 );
+          if(document.getElementById("percentage"))
+          {
+            document.getElementById("percentage").innerHTML = " Loading "+percentComplete+"%.";
+          }
+      }
+
+};
+
+//VISUALIZAR EL OBJ ANTES DE DECIMAR
+      function visualizeObj()
+      {
+        var objData;
+        var dir='/fileobj';
+        var clock = new THREE.Clock();
+        var delta = clock.getDelta(); // seconds.
+        var rotateAngle = Math.PI / 2 * delta;   // pi/2 radians (90 degrees) per second
+        var container, stats;
+
+        var camera, scene, renderer;
+
+        var mouseX = 0, mouseY = 0;
+
+        var windowHalfX = window.innerWidth / 2;
+        var windowHalfY = window.innerHeight / 2;
+
+
+        init();
+        animate();
+
+
+        function init() 
+        {
+
+          container = document.createElement( 'div' );
+          document.body.appendChild( container );
+
+          camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+          camera.position.z = 600;
+
+          // scene
+          scene = new THREE.Scene();
+
+          var ambient = new THREE.AmbientLight( 0x101030 );
+          scene.add( ambient );
+
+          var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+          directionalLight.position.set( 0, 0, 1 );
+          scene.add( directionalLight );
+
+          // texture
+          var manager = new THREE.LoadingManager();
+          manager.onProgress = function ( item, loaded, total ) {
+
+            console.log( item, loaded, total );
+
+          };
+
+
+          // model
+          var evt = document.getElementById('fileinput').value;
+          var f = evt.target.files[0]; 
+
+          if (f) {
+            var r = new FileReader();
+            r.onload = function(e) { 
+              var contents = e.target.result;
+                    objData = contents;  
+            }
+            r.readAsText(f);
+          } else { 
+            alert("Failed to load file");
+          }
+
+          //------------------------------------
+           var objLoader = new THREE.OBJLoader();
+            objLoader = objLoader.parse(objData);
+            objLoader.scale.x = 30;
+            objLoader.scale.y = 30;
+            objLoader.scale.z = 30;
+            obj = objLoader;
+            scene.add( obj );
+
+          renderer = new THREE.WebGLRenderer();
+          renderer.setSize( window.innerWidth, window.innerHeight );
+          container.appendChild( renderer.domElement );
+
+          document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+          window.addEventListener( 'resize', onWindowResize, false );
+
+        }
+
+        function onWindowResize()
+        {
+          windowHalfX = window.innerWidth / 2;
+          windowHalfY = window.innerHeight / 2;
+
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+
+          renderer.setSize( window.innerWidth, window.innerHeight );
+        }
+
+        function onDocumentMouseMove( event ) 
+        {
+          mouseX = ( event.clientX - windowHalfX ) / 2;
+          mouseY = ( event.clientY - windowHalfY ) / 2;
+        }
+
+        function animate() 
+        {
+          requestAnimationFrame( animate );
+          render();
+        }
+
+        function render() 
+        {
+
+          camera.position.x += ( mouseX - camera.position.x ) * .5;
+          camera.position.y += ( - mouseY - camera.position.y ) * .5;
+
+          camera.lookAt( scene.position );
+
+          renderer.render( scene, camera );
+        }
+      }
+
+
+
+
+
+    </script>
+</body>
+</html>

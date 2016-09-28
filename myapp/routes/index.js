@@ -83,27 +83,6 @@ router.get('/user/files', isAuthenticated, function (req, res) {
 // POST Subir archivo
 router.use("/upload", isAuthenticated);
 router.use("/upload", upload.single("obj"));
-//router.post('/upload', controladores.upload_file);
-/*router.use('/upload', 
-	multer({
-		dest: './uploads/',
-		limits: { fieldNameSize: 100, fileSize: 60000000 },
-		changeDest: function(dest, req, res) {
-			console.log('*-*-*-*-*-*-*-*-*-*-*-*-*-*-*',__dirname, dest + req.user._email);
-			var newDestination = dest + req.user._email;
-			var stat = null;
-			try {
-				stat = fs.statSync(newDestination);
-			} catch (err) {
-				fs.mkdirSync(newDestination);
-			}
-			if (stat && !stat.isDirectory()) {
-				throw new Error('Directory cannot be created because an inode of a different type exists at "' + dest + '"');
-			}
-			return newDestination
-		}
-	}).single("obj")
-);*/
 router.post('/upload', controladores.upload_file);
 // https://github.com/expressjs/multer/issues/58#issuecomment-75315556
 // http://stackoverflow.com/questions/25698176/how-to-set-different-destinations-in-nodejs-using-multer
@@ -139,11 +118,65 @@ router.get("/binary", function (req, res) {
 
 
 
+// Binario de Itzel
+router.get("/decimar", function (req, res) {
+	console.log(__dirname);
+	var path = "/home/jordy/node_projects/myapp/binarios/" + "decimacion";
+
+	var obj_name = "city.obj";
+  	var fileName = "/home/jordy/node_projects/myapp/uploads/jordy@hotmail.com/" + obj_name;
+	var newDestination = "/home/jordy/node_projects/myapp/uploads/jordy@hotmail.com/decimar/";
+	var stat = null;
+
+	try {
+		stat = fs.statSync(newDestination);
+	} catch (err) {
+		fs.mkdirSync(newDestination);
+	}
+	if (stat && !stat.isDirectory()) {
+		throw new Error('---Directory cannot be created because an inode of a different type exists at "' + dest + '"');
+	}
+	
+	origen = fileName;
+	destino = newDestination + obj_name;
+	porcentaje = 50;
+
+	const spawn = require('child_process').spawn;
+	const comando = spawn(path, [origen, destino, 50]);
+
+	res.write("Programa: " + path + "\n\n");
+	res.write("origen: " + origen + "\n\n");
+	res.write("destino: " + destino + "\n\n");
+	res.write("porcentaje: " + porcentaje + "\n\n");
+
+	comando.stdout.setEncoding('utf8');
+	comando.stderr.setEncoding('utf8');
+
+	comando.stdout.on('data', (data) => {
+		console.log(`stdout: ${data}`);
+		res.write("\n\nstdout: " + data);
+	});
+
+	comando.stderr.on('data', (data) => {
+		console.log(`stderr: ${data}`);
+		res.write("\n\nstderr: " + JSON.stringify(data));
+	});
+
+	comando.on('close', (code) => {
+		console.log(`child process exited with code ${code}`);
+		res.write("\n\nchild process exited with code " + JSON.stringify(code));
+
+		res.end();
+	});
+});
+
+
+
 
 router.get('/fileobj', function (req, res) {
 	var uploads = "/home/jordy/node_projects/myapp/uploads/";
 	var _email  = "jordy@hotmail.com";
-	var _obj    = "city.obj"
+	var _obj    = "dancer03.obj"
 
 	console.log(__dirname);
   	//var fileName = "/home/jordy/node_projects/myapp/uploads/jordy@hotmail.com/city.obj";
@@ -335,7 +368,19 @@ router.get('/json', function (req, res) {
 	res.json(obj);
 });
 
-
+router.get('/static-index', function (req, res) {
+	console.log(__dirname);
+	fs.readFile('./public/static-index.html',function (err, data) {
+		if (err) {
+			console.log(err);
+			res.writeHead(404, {'Content-Type': 'text/html'});
+		}else{   
+			res.writeHead(200, {'Content-Type': 'text/html'});  
+			res.write(data.toString());    
+		}
+		res.end();
+	}); 
+});
 
 
 
@@ -358,7 +403,7 @@ router.get('/login', function(req, res) {
 /* Handle Login POST */
 router.post('/login', passport.authenticate('login', {
 	successRedirect: '/home',
-	failureRedirect: '/login',
+	//failureRedirect: '/login',
 	failureFlash : true  
 }));
 
