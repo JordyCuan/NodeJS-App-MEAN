@@ -1,89 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Upload de archivos con Ajax</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-
-    <script src="http://threejs.org/build/three.min.js"></script>
-    <script src="http://threejs.org/examples/js/loaders/OBJLoader.js"></script>
-    <script src="http://threejs.org/examples/js/Detector.js"></script>
-    <script src="http://threejs.org/examples/js/libs/stats.min.js"></script>
-
-</head>
-<body>
-<!-- SHOW PROGRESS UPLOAD -->
-<!-- SHOW RENDER 3D BEFORE UPLOAD -->
-    <form method="POST" enctype="multipart/form-data" name="fileinfo" >
-      <input type="file" name="obj" id="obj">
-      <input type="submit" value="Subir archivo">
-    </form>
-    <div id="mensaje"></div>
-    <p id="percentage"></p>
-
-    <div>
-       <input type="button"  value="DECIMAR" onclick="showOBJDecimate()">
-     </div>
-
-     <div id="objPrevisualize">   
-      <span id="msgOBJBef" style="color:black; visibility:hidden"> OBJ loader BEFORE DECIMATION </span>
-    </div>
-
-    <div id="objDecimation">
-      <span id="msgOBJAft" style="color:black; visibility:hidden"> OBJ loader AFTER DECIMATION </span>
-    </div>
-
-
-    <script type="text/javascript">
-
-    //UPLOAD FILE WITH JUST JS AND XHR
-    var form = document.forms.namedItem("fileinfo");
-    form.addEventListener('submit', function(ev) {
-      var msg = document.getElementById("mensaje"),
-      formData = new FormData(document.forms.namedItem("fileinfo"));
-      var xhr = new XMLHttpRequest();
-      xhr.upload.onprogress = updateProgress;
-      xhr.open("POST", "/rest", true);
-      xhr.onload = function() 
-      {
-        if (xhr.status == 200) {
-            msg.innerHTML = xhr.responseText;
-        } 
-        else {
-            msg.innerHTML = xhr.responseText;
-        } 
-      };
-      xhr.send(formData);
-      ev.preventDefault();
-    }, false);
-
-    function updateProgress(evt) {
-      if (evt.lengthComputable)
-      {
-          var percentComplete = evt.loaded / evt.total;
-          percentComplete = Math.round( percentComplete*100 );
-          if(document.getElementById("percentage"))
-          {
-            document.getElementById("percentage").innerHTML = " Loading "+percentComplete+"%.";
-          }
-      }
-
-};
-
 //SHOW OBJ BEFORE THE DECIMATION
+
       var objData;
       var clock = new THREE.Clock();
       var delta = clock.getDelta(); // seconds.
       var rotateAngle = Math.PI / 2 * delta;   // pi/2 radians (90 degrees) per second
       var container, stats;
-      function visualizeObj(objData)
+      function visualizeObjPrev(objData)
       {
-        document.getElementById("msgOBJBef").style.visibility = "visible";
 
-        var camera, scene, renderer;
+        var camera, scene, renderer, controls;
 
         var mouseX = 0, mouseY = 0;
 
@@ -98,8 +23,8 @@
         function init() 
         {
 
-          //container = document.createElement( 'div' );}
-          container=document.getElementById("objPrevisualize");
+          //container = document.createElement( 'div' );
+          container = document.getElementById("objprevisualizacion");
           document.body.appendChild( container );
 
           camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -145,21 +70,22 @@
                     //MORE INFORMATION
                   }
               } );
-              object.scale.x = 30;
-              object.scale.y = 30;
-              object.scale.z = 30;
+              object.scale.x = 50;
+              object.scale.y = 50;
+              object.scale.z = 50;
               var obj = object;
               scene.add( obj );
           });
 
 
           renderer = new THREE.WebGLRenderer();
-          renderer.setSize( window.innerWidth, window.innerHeight );
+          renderer.setSize( window.innerWidth, window.innerHeight);
           container.appendChild( renderer.domElement );
 
           document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
           window.addEventListener( 'resize', onWindowResize, false );
+          controls = new THREE.OrbitControls(camera, renderer.domElement);
 
         }
 
@@ -189,12 +115,13 @@
         function render() 
         {
 
-          camera.position.x += ( mouseX - camera.position.x ) * .5;
+          /*camera.position.x += ( mouseX - camera.position.x ) * .5;
           camera.position.y += ( - mouseY - camera.position.y ) * .5;
 
-          camera.lookAt( scene.position );
+          camera.lookAt( scene.position );*/
 
           renderer.render( scene, camera );
+          controls.update();
         }
       }
 
@@ -207,7 +134,7 @@
             var r = new FileReader();
             r.onload = function(e) { 
                   objData = e.target.result;
-                  visualizeObj(objData);  
+                  visualizeObjPrev(objData);  
             }
             r.readAsText(f);
           } else { 
@@ -215,13 +142,11 @@
           }
       }
 
-          document.getElementById('obj').addEventListener('change', readSingleFile, false);
+          document.getElementById('file').addEventListener('change', readSingleFile, false);
 
-      function deletePrevElements()
+      function deleteScenePrev()
       {
-        container.removeChild(renderer.domElement );
-    }
-
-    </script>
-</body>
-</html>
+        scene = null;
+        camera = null;
+        container.removeChild(renderer.domElement);
+      }

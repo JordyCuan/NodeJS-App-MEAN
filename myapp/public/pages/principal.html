@@ -120,22 +120,32 @@
 							//UPLOAD FILE WITH JUST JS AND XHR
 							var form = document.forms.namedItem("fileinfo");
 							form.addEventListener('submit', function(ev) {
-							//var msg = document.getElementById("mensaje"),
-							formData = new FormData(document.forms.namedItem("fileinfo"));
-							var xhr = new XMLHttpRequest();
-							//xhr.upload.onprogress = updateProgress;
-							xhr.open("POST", "/upload", true);
-							xhr.onload = function() 
-							{
-							if (xhr.status == 200) {
-							    alert("ARCHIVO ENVIADO");
-							} 
-							else {
-							    alert("Fallo el envio");
-							} 
-							};
-							xhr.send(formData);
-							ev.preventDefault();
+								//var msg = document.getElementById("mensaje"),
+								formData = new FormData(document.forms.namedItem("fileinfo"));
+								var xhr = new XMLHttpRequest();
+								//xhr.upload.onprogress = updateProgress;
+								xhr.open("POST", "/upload", true);
+								xhr.onload = function() {
+									if (xhr.status == 200) {
+										$.get("/user/files", function(data, status){
+											if (status > 300) return;
+
+											var which = "";
+											for (el in data) {
+												which += "<tr><td>" + data[el]["_originalname"] + "</td><td>" + data[el]["_localname"] + "</td></tr>"
+											}
+											$("tbody").html(which);
+										});
+									    
+									    alert("ARCHIVO ENVIADO");
+									} else if (xhr.status == 304) {
+										alert("No hay sesión iniciada");
+									} else {
+									    alert("Falló el envió");
+									} 
+								};
+								xhr.send(formData);
+								ev.preventDefault();
 							}, false);
 						</script>
 

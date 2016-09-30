@@ -1,11 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <title>LOGIN FORM</title>
         <meta charset="utf-8">
-        <!-- This file has been downloaded from Bootsnipp.com. Enjoy! -->
-        <title>Clean Modal Login Form - Bootsnipp.com</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.js"></script>
+        <script src="/public/javascript/sendFile.js"></script>
+        
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
         <style type="text/css">
             @import url(http://fonts.googleapis.com/css?family=Roboto);
             /****** LOGIN MODAL ******/
@@ -24,12 +35,6 @@
             text-align: center;
             font-size: 1.8em;
             font-family: roboto;
-            }
-            .loginmodal-container input[type=submit] {
-            width: 100%;
-            display: block;
-            margin-bottom: 10px;
-            position: relative;
             }
             .loginmodal-container input[type=text], input[type=password] {
             height: 44px;
@@ -93,36 +98,56 @@
             .login-help{
             font-size: 12px;
             }
+            button {
+            width: 100%;
+            display: block;
+            margin-bottom: 10px;
+            position: relative;
+            }
         </style>
-        <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-        <!-- Optional theme -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-        <!-- Latest compiled and minified JavaScript -->
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     </head>
-    <body>
-        <div>
-            <div class="modal-dialog">
-                <div class="loginmodal-container">
-                    <h1>Login to Your Account</h1><br>
-
-                    <form action="/login" method="POST">
-                        <input type="text" name="email" placeholder="Correo@correo.com">
-                        <input type="password" name="password" placeholder="Password">
-
-                        <input type="submit" name="login" class="login loginmodal-submit" value="Login">
-                    </form>
-
+    <body ng-app="appDecimation">
+        <div class="container loginmodal-container modal-dialog">
+            <h1>Iniciar sesión</h1>
+            <form  ng-controller="initSession" ng-submit="submitData()">
+                <div class="">
+                    <div class="form-group">
+                        <label for="email">Correo Electrónico:</label>
+                        <input type="text" class="form-control" id="email" placeholder="Correo@correo.com" ng-model="user.email">
+                    </div>
+                    <div class="form-group">
+                        <label for="pwd">Contraseña:</label>
+                        <input type="password" class="form-control" id="password" placeholder="Contraseña" ng-model="user.password">
+                    </div>
+                    <button type="submit" class="login loginmodal-submit">Ingresar</button>
+                    <p>{{errorInitSession}}</p>
                     <div class="login-help">
-                        <a href="#">Register</a> - <a href="#">Forgot Password</a>
-                        <%if (message) { %>
-                            <h1 class="text-center error-message"> <%= message %> </h1>
-                        <% } %>
+                        <a href="/signup">Register</a> - <a href="#">Forgot Password</a>
+                        <h1 class="text-center error-message"></h1>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
+        <script>
+            var postApp = angular.module('appDecimation', []);
+              // Controller function and passing $http service and $scope var.
+              postApp.controller('initSession', function($scope, $http) {
+                // create a blank object to handle form data.
+                  $scope.user = {};
+                // calling our submit function.
+                  $scope.submitData = function () {
+                    $http.post("/login", $scope.user)
+                    .then( 
+                      function mySucces(response) {
+                        window.location = "/principal";
+                      }, 
+                      function myError(response) {
+                        $scope.errorInitSession = "ERROR, intenta de nuevo";
+                        //window.location = "/static-index.html"
+                      }
+                    );
+                  }
+              });
+        </script>
     </body>
 </html>
-

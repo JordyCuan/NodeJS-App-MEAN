@@ -1,3 +1,4 @@
+var path = require('path');
 var express = require('express');
 var router = express.Router();
 var fs = require('fs');
@@ -301,7 +302,6 @@ router.get("/uploadfile-js", function(req, res) {
 
 
 router.get('/principal', isAuthenticated, function (req, res) {
-	console.log(__dirname);
 	fs.readFile('./public/pages/principal.html',function (err, data) {
 		if (err) {
 			console.log(err);
@@ -327,7 +327,7 @@ var passport = require('passport');
 /* GET login page. */
 router.get('/login', function(req, res) {
 	// Display the Login page with any flash message, if any
-	res.render('login', { message : "" });
+	res.render('login');
 });
 
 /* Handle Login POST */
@@ -339,7 +339,7 @@ router.post('/login', passport.authenticate('login', {
 
 /* GET Registration Page */
 router.get('/signup', function(req, res){
-	res.render('signup', { /* message: req.flash('message') */ });
+	res.render('signup');
 });
 
 /* Handle Registration POST */
