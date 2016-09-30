@@ -16,7 +16,7 @@
 </head>
 <body>
 <!-- SHOW PROGRESS UPLOAD -->
-<!-- SHOW RENDER 3D -->
+<!-- SHOW RENDER 3D BEFORE UPLOAD -->
     <form method="POST" enctype="multipart/form-data" name="fileinfo" >
       <input type="file" name="obj" id="obj">
       <input type="submit" value="Subir archivo">
@@ -25,8 +25,16 @@
     <p id="percentage"></p>
 
     <div>
-       <input type="button"  value="VER RENDER" onclick="visualizeObj()">
+       <input type="button"  value="DECIMAR" onclick="showOBJDecimate()">
      </div>
+
+     <div id="objPrevisualize">   
+      <span id="msgOBJBef" style="color:black; visibility:hidden"> OBJ loader BEFORE DECIMATION </span>
+    </div>
+
+    <div id="objDecimation">
+      <span id="msgOBJAft" style="color:black; visibility:hidden"> OBJ loader AFTER DECIMATION </span>
+    </div>
 
 
     <script type="text/javascript">
@@ -65,15 +73,15 @@
 
 };
 
-//VISUALIZAR EL OBJ ANTES DE DECIMAR
-      function visualizeObj()
+//SHOW OBJ BEFORE THE DECIMATION
+      var objData;
+      var clock = new THREE.Clock();
+      var delta = clock.getDelta(); // seconds.
+      var rotateAngle = Math.PI / 2 * delta;   // pi/2 radians (90 degrees) per second
+      var container, stats;
+      function visualizeObj(objData)
       {
-        var objData;
-        var dir='/fileobj';
-        var clock = new THREE.Clock();
-        var delta = clock.getDelta(); // seconds.
-        var rotateAngle = Math.PI / 2 * delta;   // pi/2 radians (90 degrees) per second
-        var container, stats;
+        document.getElementById("msgOBJBef").style.visibility = "visible";
 
         var camera, scene, renderer;
 
@@ -90,7 +98,8 @@
         function init() 
         {
 
-          container = document.createElement( 'div' );
+          //container = document.createElement( 'div' );}
+          container=document.getElementById("objPrevisualize");
           document.body.appendChild( container );
 
           camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -114,30 +123,35 @@
 
           };
 
-
           // model
-          var evt = document.getElementById('fileinput').value;
-          var f = evt.target.files[0]; 
+            var loader = new THREE.OBJLoader();
+          // Add a localtext parameter and an if check if url == ""
+            loader.load =   function load( url, localtext, onLoad, onProgress, onError ) {
+            var scope = this;
+            var loader = new THREE.XHRLoader( scope.manager );
+            loader.setPath( this.path );
+            loader.load( url, function ( text ) {
+                if (url==""){
+                    text = localtext;
+                }
+                onLoad( scope.parse( text ) );
+            }, onProgress, onError );
+        },
 
-          if (f) {
-            var r = new FileReader();
-            r.onload = function(e) { 
-              var contents = e.target.result;
-                    objData = contents;  
-            }
-            r.readAsText(f);
-          } else { 
-            alert("Failed to load file");
-          }
+          // Now you can use either url or directly string input.
+          loader.load( '', objData, function ( object ) {
+              object.traverse( function ( child ) {
+                  if ( child instanceof THREE.Mesh ) {
+                    //MORE INFORMATION
+                  }
+              } );
+              object.scale.x = 30;
+              object.scale.y = 30;
+              object.scale.z = 30;
+              var obj = object;
+              scene.add( obj );
+          });
 
-          //------------------------------------
-           var objLoader = new THREE.OBJLoader();
-            objLoader = objLoader.parse(objData);
-            objLoader.scale.x = 30;
-            objLoader.scale.y = 30;
-            objLoader.scale.z = 30;
-            obj = objLoader;
-            scene.add( obj );
 
           renderer = new THREE.WebGLRenderer();
           renderer.setSize( window.innerWidth, window.innerHeight );
@@ -185,8 +199,28 @@
       }
 
 
+      function readSingleFile(evt) {
+          //Retrieve the first (and only!) File from the FileList object
+          var f = evt.target.files[0]; 
 
+          if (f) {
+            var r = new FileReader();
+            r.onload = function(e) { 
+                  objData = e.target.result;
+                  visualizeObj(objData);  
+            }
+            r.readAsText(f);
+          } else { 
+            alert("Failed to load file");
+          }
+      }
 
+          document.getElementById('obj').addEventListener('change', readSingleFile, false);
+
+      function deletePrevElements()
+      {
+        container.removeChild(renderer.domElement );
+    }
 
     </script>
 </body>

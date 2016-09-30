@@ -29,6 +29,13 @@ var upload = multer(
 			fieldNameSize: 100,
 			fileSize: 60000000
 		},
+		fileFilter: function (req, file, cb) {
+		    if (!file.originalname.match(/\.(obj)$/)) {
+		    //if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+		        return cb(new Error('Only OBJ files are allowed!'));
+		    }
+		    cb(null, true);
+    	},
 		storage: storage
 	}
 );
@@ -45,25 +52,21 @@ var isAuthenticated = function (req, res, next) {// if user is authenticated in 
 
 	// if the user is not authenticated then redirect him to the login page
 	res.redirect('/login'); // TODO - Si va a ser un servicio web, se deberían de settear errores y mensajes aquí.
+//	res.status(304)        // HTTP status 304: NotLogged
+//    	.send('Not found');
 }
 
 
-sleep = function (milliseconds) {
-	var start = new Date().getTime();
-	for (var i = 0; i < 10e7; i++) {
-		if ((new Date().getTime() - start) > milliseconds){
-			break;
-	}
-  }
+var authEndPoint = function (req, res, next) {
+	if (req.isAuthenticated()) return next();
+
+	res.status(304).send('Not Authenticated. Log in first');
 }
-
-
-
 
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('index');
 });
 
 
@@ -75,13 +78,22 @@ router.get('/user/list', controladores.user_list);
 
 
 // Archivos por usuario
-router.get('/user/files', isAuthenticated, function (req, res) {
-	res.json(req.user._objs); // Devolver sus archivos asociados
+router.get('/user/files', authEndPoint, function (req, res) {
+	var Obj  = require('../models/archivos_obj');
+
+	var result = Obj.find({'_id': { $in: req.user._objs}}, function(err, docs){
+		if (err){
+			console.log(err);
+		} 
+		else {
+			res.json(docs);
+		}
+	});
 });
 
 
 // POST Subir archivo
-router.use("/upload", isAuthenticated);
+router.use("/upload", authEndPoint);
 router.use("/upload", upload.single("obj"));
 router.post('/upload', controladores.upload_file);
 // https://github.com/expressjs/multer/issues/58#issuecomment-75315556
@@ -89,43 +101,29 @@ router.post('/upload', controladores.upload_file);
 
 
 
-
-// Calling a binary
-router.get("/binary", function (req, res) {
-	const spawn = require('child_process').spawn;
-	const comando = spawn('ls', ['-lh', '/usr']);
-
-	comando.stdout.setEncoding('utf8');
-	comando.stderr.setEncoding('utf8');
-
-	comando.stdout.on('data', (data) => {
-		console.log(`stdout: ${data}`);
-		res.write("\n\nstdout: " + data);
-	});
-
-	comando.stderr.on('data', (data) => {
-		console.log(`stderr: ${data}`);
-		res.write("\n\nstderr: " + JSON.stringify(data));
-	});
-
-	comando.on('close', (code) => {
-		console.log(`child process exited with code ${code}`);
-		res.write("\n\nchild process exited with code " + JSON.stringify(code));
-
-		res.end();
-	});
-});
-
-
-
 // Binario de Itzel
-router.get("/decimar", function (req, res) {
-	console.log(__dirname);
-	var path = "/home/jordy/node_projects/myapp/binarios/" + "decimacion";
+router.post("/decimar", authEndPoint, function (req, res) {
+	var exe = "/home/jordy/node_projects/myapp/binarios/" + "decimacion"; // TODO - Debe ser un path relativo, no absoluto
+	var uploads_path = "/home/jordy/node_projects/myapp/uploads/"; // TODO - Implementar el uso de la funcion path para hacer join y evitar concatenar
 
-	var obj_name = "city.obj";
-  	var fileName = "/home/jordy/node_projects/myapp/uploads/jordy@hotmail.com/" + obj_name;
-	var newDestination = "/home/jordy/node_projects/myapp/uploads/jordy@hotmail.com/decimar/";
+	var resultado = {
+		codigo : 1 // 1 : Error
+	};
+
+	if (! req.body) {
+		console.log("No hay FORM-DATA");
+		res.json(resultado);
+		return;
+	}
+	if (! req.body.obj || ! req.body.porcentaje) {
+		console.log("Falto algún parametro para realizar la decimación");
+		res.json(resultado);
+		return;
+	}
+
+	var obj_name = req.body.obj;
+  	var fileName = uploads_path + req.user._email + "/" + obj_name;
+	var newDestination = uploads_path + req.user._email + "/decimar/";
 	var stat = null;
 
 	try {
@@ -139,49 +137,57 @@ router.get("/decimar", function (req, res) {
 	
 	origen = fileName;
 	destino = newDestination + obj_name;
-	porcentaje = 50;
+	porcentaje = req.body.porcentaje;
 
 	const spawn = require('child_process').spawn;
-	const comando = spawn(path, [origen, destino, 50]);
-
-	res.write("Programa: " + path + "\n\n");
-	res.write("origen: " + origen + "\n\n");
-	res.write("destino: " + destino + "\n\n");
-	res.write("porcentaje: " + porcentaje + "\n\n");
+	const comando = spawn(exe, [origen, destino, porcentaje]);
 
 	comando.stdout.setEncoding('utf8');
 	comando.stderr.setEncoding('utf8');
 
 	comando.stdout.on('data', (data) => {
 		console.log(`stdout: ${data}`);
-		res.write("\n\nstdout: " + data);
 	});
 
 	comando.stderr.on('data', (data) => {
 		console.log(`stderr: ${data}`);
-		res.write("\n\nstderr: " + JSON.stringify(data));
 	});
 
+	// TODO - Se debería guardar en la Base de Datos, si sí, entonces ¿cómo?
 	comando.on('close', (code) => {
 		console.log(`child process exited with code ${code}`);
-		res.write("\n\nchild process exited with code " + JSON.stringify(code));
-
-		res.end();
+		if (code === 0) {
+			//resultado.destino = destino;
+			resultado.codigo = 0;
+		} 
+		else {
+			resultado.codigo = 1;
+		}
+		// TODO - Notificar al cliente
+		console.log( JSON.stringify(resultado) );
+		res.json(resultado);
 	});
 });
 
 
 
-
-router.get('/fileobj', function (req, res) {
+// TODO - Devolver el archivo dinámicamente
+router.get('/fileobj/:obj', authEndPoint, function (req, res) {
 	var uploads = "/home/jordy/node_projects/myapp/uploads/";
-	var _email  = "jordy@hotmail.com";
-	var _obj    = "dancer03.obj"
+	//var _email  = "jordy@hotmail.com";//req.user._email;
+	//var _obj    = "dd223c036a372347dfff98b4d8221bed"
 
-	console.log(__dirname);
   	//var fileName = "/home/jordy/node_projects/myapp/uploads/jordy@hotmail.com/city.obj";
-	var fileName = uploads + _email + "/" + _obj;
+	var fileName = uploads + req.user._email + "/decimar/" + req.params.obj;;
 
+	// TODO - Corregir
+	console.log(fileName);
+
+	if (!fileName) {
+		console.log("***GET /fileobj - No se proporcionó un fileName Válido");
+		res.end();
+		return;
+	}
 
 	var options = {
     	headers: {
@@ -203,13 +209,6 @@ router.get('/fileobj', function (req, res) {
     	}
   	});
 });
-
-
-
-
-
-
-
 
 
 
@@ -301,9 +300,9 @@ router.get("/uploadfile-js", function(req, res) {
 });
 
 
-router.get('/archivo', function (req, res) {
+router.get('/principal', isAuthenticated, function (req, res) {
 	console.log(__dirname);
-	fs.readFile('./public/pages/hello_estatico.html',function (err, data) {
+	fs.readFile('./public/pages/principal.html',function (err, data) {
 		if (err) {
 			console.log(err);
 			res.writeHead(404, {'Content-Type': 'text/html'});
@@ -314,75 +313,6 @@ router.get('/archivo', function (req, res) {
 		res.end();
 	}); 
 });
-
-
-router.get('/angular', isAuthenticated, function (req, res) {
-	console.log(__dirname);
-	fs.readFile('./public/pages/angular.html',function (err, data) {
-		if (err) {
-			console.log(err);
-			res.writeHead(404, {'Content-Type': 'text/html'});
-		}else{   
-			res.writeHead(200, {'Content-Type': 'text/html'});  
-			res.write(data.toString());    
-		}
-		res.end();
-	}); 
-});
-
-
-router.get('/angular2', isAuthenticated, function (req, res) {
-	console.log(__dirname);
-	fs.readFile('./public/pages/angular2.html',function (err, data) {
-		if (err) {
-			console.log(err);
-			res.writeHead(404, {'Content-Type': 'text/html'});
-		}else{   
-			res.writeHead(200, {'Content-Type': 'text/html'});  
-			res.write(data.toString());    
-		}
-		res.end();
-	}); 
-});
-
-
-
-router.get('/angularJSON', function (req, res) {
-	console.log(__dirname);
-	fs.readFile('./public/pages/angularAPI.html',function (err, data) {
-		if (err) {
-			console.log(err);
-			res.writeHead(404, {'Content-Type': 'text/html'});
-		}else{   
-			res.writeHead(200, {'Content-Type': 'text/html'});  
-			res.write(data.toString());    
-		}
-		res.end();
-	}); 
-});
-
-
-router.get('/json', function (req, res) {
-	obj = [ {"id": 1,"name": "Walter", "surname": "White"},  {"id": 2,"name": "Jesse", "surname": "Pinkman"},
-			{"id": 3,"name": "Jordy", "surname": "Cuan"},  {"id": 4,"name": "Pedro", "surname": "Pérez"} ]
-	res.json(obj);
-});
-
-router.get('/static-index', function (req, res) {
-	console.log(__dirname);
-	fs.readFile('./public/static-index.html',function (err, data) {
-		if (err) {
-			console.log(err);
-			res.writeHead(404, {'Content-Type': 'text/html'});
-		}else{   
-			res.writeHead(200, {'Content-Type': 'text/html'});  
-			res.write(data.toString());    
-		}
-		res.end();
-	}); 
-});
-
-
 
 
 
@@ -397,14 +327,12 @@ var passport = require('passport');
 /* GET login page. */
 router.get('/login', function(req, res) {
 	// Display the Login page with any flash message, if any
-	res.render('login', { message: req.flash('Revisa los campos y vuelve a intentarlo') });
+	res.render('login', { message : "" });
 });
 
 /* Handle Login POST */
 router.post('/login', passport.authenticate('login', {
-	successRedirect: '/home',
-	//failureRedirect: '/login',
-	failureFlash : true  
+	successRedirect: '/principal'  // TODO - A donde redireccionar?
 }));
 
 
@@ -416,7 +344,7 @@ router.get('/signup', function(req, res){
 
 /* Handle Registration POST */
 router.post('/signup', passport.authenticate('signup', {
-	successRedirect: '/home',
+	successRedirect: '/principal',  // TODO - A donde redireccionar?
 	failureRedirect: '/signup',
 	failureFlash : true  
 }));

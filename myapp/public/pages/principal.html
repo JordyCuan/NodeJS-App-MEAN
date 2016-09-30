@@ -13,6 +13,13 @@
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> 
+		<script src="http://threejs.org/build/three.min.js"></script>
+	    <script src="http://threejs.org/examples/js/loaders/OBJLoader.js"></script>
+	    <script src="http://threejs.org/examples/js/Detector.js"></script>
+	    <script src="http://threejs.org/examples/js/controls/OrbitControls.js"</script>
+	    <script src="http://threejs.org/examples/js/libs/stats.min.js"></script>
+		<script src="/javascripts/renderOBJDec.js" type="text/javascript" charset="utf-8" async defer></script> 
+		<script src="/javascripts/renderOBJPrev.js" type="text/javascript" charset="utf-8" async defer></script> 
 	</head>
 	<body>
 		<div class="container">
@@ -21,11 +28,14 @@
 					<div id="user">
 						<div class="signup-wall">
 							
-							<form action="/upload" method="POST" enctype="multipart/form-data">
-								<input type="file" name="obj">
+							<form  method="POST" enctype="multipart/form-data" name="fileinfo">
+								<input type="file" name="obj" id="file">
 								<input type="submit" value="Subir archivo">
+								<!-- Cuando se termine de subir se debe hacer nuevamente Ajax en el callback para 
+								actualizar la lista de sus modelos -->
 							</form>
 
+							
 							<br><br>
 							<table id="" style="width:100%">
 								<thead>
@@ -36,7 +46,7 @@
 								</thead>
 								<tbody>
 								</tbody>
-
+								
 								<script type="text/javascript">
 									$.get("/user/files", function(data, status){
 										if (status > 300) return;
@@ -50,7 +60,7 @@
 								</script>
 							</table>
 						</div>
-						<a href="/signout" class="text-center new-account">Sign Out</a>
+						<a href="/login" class="text-center new-account">Sign Out</a>
 
 
 						<br><br>
@@ -61,8 +71,18 @@
 
 						<button id="decimar">Decimar</button>
 						<br><br>
-						<p>El resultado de la decimación se encuentra en: </p>
+
+						<button id="deleteSceneDec" onclick="deleteSceneDec()">Limpiar</button>
+						<br><br>
+
+
 						<p id="dir_deci"></p>
+
+						<!-- VER AMBOS OBJ-->
+						<div id="objdecimado" ></div>
+						<div id="objprevisualizacion" ></div>
+
+						<!-- ____________________________________________________________________________ -->
 
 						<script type="text/javascript">
 
@@ -74,16 +94,52 @@
 									"obj"        : el1,
 									"porcentaje" : el2
 								};
-console.log(form_data);
+								console.log(form_data);
 								$.post("/decimar", form_data, function(data, status){
 									if (status > 300) return;
 
-									dir = data.split("\n");
-									data = dir[dir.length - 1];
-									$("#dir_deci").html(data);
+									//dir = data.split("\n");
+									//data = dir[dir.length - 1];
+									console.log(data);
+									if (data["codigo"] > 0) {
+										$("#dir_deci").html("Hubo un problema al decimar el Objeto");
+									}
+									$("#dir_deci").html("Objeto decimado con éxito");
 								});
 							});					
 						</script>
+
+						<button id="ver">Ver objeto decimado</button>
+						<script type="text/javascript">
+							$("#ver").click(function () {
+								console.log( "/fileobj/" + $("#obj").val() );
+								visualizeObjDec( "/fileobj/" + $("#obj").val() );								
+							});
+						</script>
+						<script>
+							//UPLOAD FILE WITH JUST JS AND XHR
+							var form = document.forms.namedItem("fileinfo");
+							form.addEventListener('submit', function(ev) {
+							//var msg = document.getElementById("mensaje"),
+							formData = new FormData(document.forms.namedItem("fileinfo"));
+							var xhr = new XMLHttpRequest();
+							//xhr.upload.onprogress = updateProgress;
+							xhr.open("POST", "/upload", true);
+							xhr.onload = function() 
+							{
+							if (xhr.status == 200) {
+							    alert("ARCHIVO ENVIADO");
+							} 
+							else {
+							    alert("Fallo el envio");
+							} 
+							};
+							xhr.send(formData);
+							ev.preventDefault();
+							}, false);
+						</script>
+
+
 					</div>
 				</div>
 			</div>

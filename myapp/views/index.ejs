@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title><%= title %></title>
 		<link rel='stylesheet' href='/stylesheets/style.css' />
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-		<script type="text/javascript" src="/javascripts/test.js"></script>
-
+		
 
 		<!-- Latest compiled and minified CSS -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -18,20 +16,8 @@
 		
 	</head>
 	<body>
-		<h1><%= title %></h1>
-		<p>Welcome to <%= title %></p>
-		<button id="button" type="button">Click Me!</button> 
-		<p id="pp">El titulo desapareció!!!</p>
-
-
-		<br>
-		<button id="bget" type="button">Servicio GET</button>
-		<button id="bpost" type="button">Servicio POST</button>
-		<button id="bput" type="button">Servicio PUT</button>
-		<button id="bdelete" type="button">Servicio DELETE</button>
-
-		<p>Resultado de la petición AJAX:</p>
-		<p id="res"></p>
-
+		<script type="text/javascript">
+			window.location = "/principal";
+		</script>
 	</body>
 </html>
