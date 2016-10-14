@@ -1,8 +1,12 @@
 var mongoose = require('mongoose');
  
 module.exports = mongoose.model('archivos_obj',{
-    _originalname: String,
-    _localname: String,
+    _originalname: {
+    	type: String,
+    	required: true,
+        unique: true
+    },  
+    //_localname: String,
     _path_and_name: String,
     _path: String,
     _encoding: String,

@@ -20,6 +20,9 @@ var storage = multer.diskStorage({
 			throw new Error('---Directory cannot be created because an inode of a different type exists at "' + dest + '"');
 		}		
 		cb(null, newDestination);
+	},
+	filename: function (req, file, cb) {
+		cb(null, file.originalname)
 	}
 });
 
@@ -53,8 +56,8 @@ var isAuthenticated = function (req, res, next) {// if user is authenticated in 
 
 	// if the user is not authenticated then redirect him to the login page
 	res.redirect('/login'); // TODO - Si va a ser un servicio web, se deberían de settear errores y mensajes aquí.
-//	res.status(304)        // HTTP status 304: NotLogged
-//    	.send('Not found');
+	//res.status(304)        // HTTP status 304: NotLogged
+	//	.send('Not found');
 }
 
 
@@ -66,9 +69,7 @@ var authEndPoint = function (req, res, next) {
 
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index');
-});
+router.get('/', function(req, res, next) { res.render('index'); });
 
 
 var controladores = require('../controllers/controladores')
@@ -87,7 +88,15 @@ router.get('/user/files', authEndPoint, function (req, res) {
 			console.log(err);
 		} 
 		else {
-			res.json(docs);
+			// TODO - Que información deberíamos de devolver??
+			n = []
+			for (el in docs) {
+				ob = {}
+				ob._originalname = docs[el]._originalname;
+				// delete docs[el]._originalname;
+				n.push(ob);
+			}
+			res.json(n);
 		}
 	});
 });
@@ -104,7 +113,7 @@ router.post('/upload', controladores.upload_file);
 
 // Binario de Itzel
 router.post("/decimar", authEndPoint, function (req, res) {
-	var exe = "/home/jordy/node_projects/myapp/binarios/" + "decimacion"; // TODO - Debe ser un path relativo, no absoluto
+	var exe = "/home/jordy/node_projects/myapp/binarios/" + "pasopar1"; // TODO - Debe ser un path relativo, no absoluto
 	var uploads_path = "/home/jordy/node_projects/myapp/uploads/"; // TODO - Implementar el uso de la funcion path para hacer join y evitar concatenar
 
 	var resultado = {
@@ -217,18 +226,6 @@ router.get('/fileobj/:obj', authEndPoint, function (req, res) {
 //req.params	- /element/:id/
 //req.body		- /element/
 //req.query		- /element?id=valor
-
-router.get('/rest', function (req, res) {
-	res.write("Respuesta de Peticion GET\n");
-	params = req.query;
-
-	for (p in params) {
-		res.write(p + "\t\t" + params[p] + "\n");
-	}
-	res.end();
-});
-
-
 router.post('/rest', multer(
 	{ 
 		dest: 'uploads/',
@@ -256,14 +253,6 @@ router.post('/rest', multer(
 });
 
 
-router.put('/rest', function (req, res) {
-	res.send("Peticion PUT");
-});
-router.delete('/rest', function (req, res) {
-	res.send("Peticion DELETE");
-});
-
-
 
 
 /************************************************************************************************/
@@ -272,22 +261,11 @@ router.delete('/rest', function (req, res) {
 /************************************************************************************************/
 /************************************************************************************************/
 router.get("/uploadfile", function(req, res) {
-	console.log(__dirname);
-	fs.readFile('./public/pages/UploadFile.html',function (err, data) {
-		if (err) {
-			console.log(err);
-			res.writeHead(404, {'Content-Type': 'text/html'});
-		}else{   
-			res.writeHead(200, {'Content-Type': 'text/html'});  
-			res.write(data.toString());    
-		}
-		res.end();
-	}); 	
+	res.render('UploadFile');
 });
 
 
 router.get("/uploadfile-js", function(req, res) {
-	console.log(__dirname);
 	fs.readFile('./public/pages/UploadFile-JS.html',function (err, data) {
 		if (err) {
 			console.log(err);
@@ -363,7 +341,6 @@ router.get('/signout', function(req, res) {
 // ******* Esta es una pagina protegida ********
 /* GET Home Page */
 router.get('/home', isAuthenticated, function(req, res){
-	console.log(req.user)
 	res.render('home', { user: req.user });
 });
 
