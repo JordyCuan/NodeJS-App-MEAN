@@ -45,36 +45,35 @@ app.controller('principalCtrl', function($scope, serviceObjs)
       //ACTUALIZAR LA LISTA DE OBJS DEL USUARIO
       var list = serviceObjs.getObjs();
       list.then (function mySucces(response)
-      {
-        $scope.objs = response.data;
-      }, function myError(response)
-      {
-        $scope.msgObj = "An error ocurred while update OBJ list";
-      }
+        {
+          $scope.objs = response.data;
+        },function myError(response)
+          {
+            $scope.msgObj = "An error ocurred while update OBJ list";
+          }
       )
-    }, function myError(response)
-    {
-      $scope.msg = "An error ocurred at upload file";
-    }
-    )
+      },function myError(response)
+          {
+            $scope.msg = "An error ocurred at upload file";
+          }
+      )
   }
 
   //VER OBJETO ANTES DE DECIRMAR
-
   $scope.decimar = function()
   {
     //Recibo el identificar del archivo a previsualizar
-    if ( $scope.filesObj == undefined && $scope.filesObj == null )
+    if ( $scope.filesObj == undefined || $scope.filesObj == null )
     {
       alert("NO HAS SELECCIONADO NADA");
     }
     else
     {
-      var idObjSelected = $scope.filesObj._id;
+      var idObjSelected = $scope.filesObj._originalname;
       $scope.msgObj = idObjSelected;
     }
   }
-
+ 
 
 
 

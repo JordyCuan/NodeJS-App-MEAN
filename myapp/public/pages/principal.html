@@ -1,159 +1,56 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-		<title></title>
-		<!-- Latest compiled and minified CSS -->
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+		<title>HOME</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
-		<!-- Optional theme -->
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-		<!-- Latest compiled and minified JavaScript -->
+		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> 
-		<script src="http://threejs.org/build/three.min.js"></script>
-	    <script src="http://threejs.org/examples/js/loaders/OBJLoader.js"></script>
-	    <script src="http://threejs.org/examples/js/Detector.js"></script>
-	    <script src="http://threejs.org/examples/js/controls/OrbitControls.js"</script>
-	    <script src="http://threejs.org/examples/js/libs/stats.min.js"></script>
-		<script src="/javascripts/renderOBJDec.js" type="text/javascript" charset="utf-8" async defer></script> 
-		<script src="/javascripts/renderOBJPrev.js" type="text/javascript" charset="utf-8" async defer></script> 
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js" type="text/javascript"></script> 
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular-route.min.js"></script>
+		
+		<script src="/javascripts/moduleApp.js"></script>        
+		<script src="/javascripts/controllersApp.js"></script> 
+		<script src="/javascripts/servicesApp.js"></script> 
 	</head>
-	<body>
+	<body ng-app="appDecimation" ng-controller="principalCtrl">
 		<div class="container">
 			<div class="row">
 				<div class="col-sm-6 col-md-4 col-md-offset-4">
 					<div id="user">
 						<div class="signup-wall">
-							
-							<form  method="POST" enctype="multipart/form-data" name="fileinfo">
-								<input type="file" name="obj" id="file">
-								<input type="submit" value="Subir archivo">
-								<!-- Cuando se termine de subir se debe hacer nuevamente Ajax en el callback para 
-								actualizar la lista de sus modelos -->
-							</form>
 
-							
+							<!-- Formulario para enviar un nuevo obj-->
+							<div>
+								<form  method="POST" enctype="multipart/form-data" name="fileinfo" ng-submit="sendFile()">
+									<input type="file" name="obj" id="file" ng-model="file">
+									<input type="submit" value="Subir archivo">
+								</form>
+								<p>{{msg}}</p>
+							</div>
+
 							<br><br>
-							<table id="" style="width:100%">
-								<thead>
-									<tr>
-										<td><strong>Nombre Original del Obj</strong></td>
-										<td><strong>Nombre dentro del servidor</strong></td>
-									</tr>
-								</thead>
-								<tbody>
-								</tbody>
-								
-								<script type="text/javascript">
-									$.get("/user/files", function(data, status){
-										if (status > 300) return;
+							<!-- Seleccionar algún obj ya cargado para decimarlo -->
+							<div>
+								<select ng-model="filesObj" ng-options="x._originalname for x in objs"></select>
+								 <p>You selected: {{filesObj._originalname}}</p>
+								<input type="number" name="porcentaje" id="porcentaje" min="1" max="100">
+								<button id="decimar" ng-click="decimar()">Decimar</button>
+								<p>{{msgObj}}</p>
+							</div>
 
-										var which = "";
-										for (el in data) {
-											which += "<tr><td>" + data[el]["_originalname"] + "</td><td>" + data[el]["_localname"] + "</td></tr>"
-										}
-										$("tbody").html(which);
-									});
-								</script>
-							</table>
+							<div ng-model="renderObjs"></div>
+
+							<br><br>
+							<a href="/login" class="text-center new-account">Sign Out</a>
 						</div>
-						<a href="/login" class="text-center new-account">Sign Out</a>
-
-
-						<br><br>
-						Nombre del objeto dentro del servidor:
-						<input type="text" name="obj" id="obj" placeholder="Nombre en servidor"><br>
-						Porcentaje de la decimacion:
-						<input type="text" name="porcentaje" id="porcentaje" placeholder="Procentaje">
-
-						<button id="decimar">Decimar</button>
-						<br><br>
-
-						<button id="deleteSceneDec" onclick="deleteSceneDec()">Limpiar</button>
-						<br><br>
-
-
-						<p id="dir_deci"></p>
-
-						<!-- VER AMBOS OBJ-->
-						<div id="objdecimado" ></div>
-						<div id="objprevisualizacion" ></div>
-
-						<!-- ____________________________________________________________________________ -->
-
-						<script type="text/javascript">
-
-							$("#decimar").click(function () {
-								var el1 = $("#obj").val(); 
-								var el2 = parseInt($("#porcentaje").val()); 
-
-								var form_data = {
-									"obj"        : el1,
-									"porcentaje" : el2
-								};
-								console.log(form_data);
-								$.post("/decimar", form_data, function(data, status){
-									if (status > 300) return;
-
-									//dir = data.split("\n");
-									//data = dir[dir.length - 1];
-									console.log(data);
-									if (data["codigo"] > 0) {
-										$("#dir_deci").html("Hubo un problema al decimar el Objeto");
-									}
-									$("#dir_deci").html("Objeto decimado con éxito");
-								});
-							});					
-						</script>
-
-						<button id="ver">Ver objeto decimado</button>
-						<script type="text/javascript">
-							$("#ver").click(function () {
-								console.log( "/fileobj/" + $("#obj").val() );
-								visualizeObjDec( "/fileobj/" + $("#obj").val() );								
-							});
-						</script>
-						<script>
-							//UPLOAD FILE WITH JUST JS AND XHR
-							var form = document.forms.namedItem("fileinfo");
-							form.addEventListener('submit', function(ev) {
-								//var msg = document.getElementById("mensaje"),
-								formData = new FormData(document.forms.namedItem("fileinfo"));
-								var xhr = new XMLHttpRequest();
-								//xhr.upload.onprogress = updateProgress;
-								xhr.open("POST", "/upload", true);
-								xhr.onload = function() {
-									if (xhr.status == 200) {
-										$.get("/user/files", function(data, status){
-											if (status > 300) return;
-
-											var which = "";
-											for (el in data) {
-												which += "<tr><td>" + data[el]["_originalname"] + "</td><td>" + data[el]["_localname"] + "</td></tr>"
-											}
-											$("tbody").html(which);
-										});
-									    
-									    alert("ARCHIVO ENVIADO");
-									} else if (xhr.status == 304) {
-										alert("No hay sesión iniciada");
-									} else {
-									    alert("Falló el envió");
-									} 
-								};
-								xhr.send(formData);
-								ev.preventDefault();
-							}, false);
-						</script>
-
-
 					</div>
 				</div>
 			</div>
 		</div>
 	</body>
 </html>
-

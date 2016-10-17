@@ -138,3 +138,26 @@ exports.upload_file = function function_name(req, res) {
 	    }
 	});	
 }
+
+
+// GET - /user/files
+exports.user_files = function (req, res) {
+	var Obj  = require('../models/archivos_obj');
+
+	var result = Obj.find({'_id': { $in: req.user._objs}}, function(err, docs){
+		if (err){
+			console.log(err);
+		} 
+		else {
+			// TODO - Que información deberíamos de devolver??
+			n = []
+			for (el in docs) {
+				ob = {}
+				ob._originalname = docs[el]._originalname;
+				// delete docs[el]._originalname;
+				n.push(ob);
+			}
+			res.json(n);
+		}
+	});
+}

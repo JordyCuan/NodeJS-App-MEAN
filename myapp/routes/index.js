@@ -72,7 +72,8 @@ var authEndPoint = function (req, res, next) {
 router.get('/', function(req, res, next) { res.render('index'); });
 
 
-var controladores = require('../controllers/controladores')
+var controladores = require('../controllers/controladores');
+var control_descargas = require('../controllers/controlador_descargas');
 
 
 router.post('/user/add', controladores.add);
@@ -80,26 +81,8 @@ router.get('/user/list', controladores.user_list);
 
 
 // Archivos por usuario
-router.get('/user/files', authEndPoint, function (req, res) {
-	var Obj  = require('../models/archivos_obj');
-
-	var result = Obj.find({'_id': { $in: req.user._objs}}, function(err, docs){
-		if (err){
-			console.log(err);
-		} 
-		else {
-			// TODO - Que información deberíamos de devolver??
-			n = []
-			for (el in docs) {
-				ob = {}
-				ob._originalname = docs[el]._originalname;
-				// delete docs[el]._originalname;
-				n.push(ob);
-			}
-			res.json(n);
-		}
-	});
-});
+router.use('/user/files', authEndPoint);
+router.get('/user/files', controladores.user_files);
 
 
 // POST Subir archivo
@@ -110,10 +93,20 @@ router.post('/upload', controladores.upload_file);
 // http://stackoverflow.com/questions/25698176/how-to-set-different-destinations-in-nodejs-using-multer
 
 
+// Descargas de archivos objs: 
+// Originales 
+router.use("/file/original/:obj", authEndPoint);
+router.get('/file/original/:obj', control_descargas.desc_original);
+// y decimados
+router.use("/file/decimado/:obj", authEndPoint);
+router.get('/file/decimado/:obj', control_descargas.desc_decimado);
+
+
+
 
 // Binario de Itzel
 router.post("/decimar", authEndPoint, function (req, res) {
-	var exe = "/home/jordy/node_projects/myapp/binarios/" + "pasopar1"; // TODO - Debe ser un path relativo, no absoluto
+	var exe = "/home/jordy/node_projects/myapp/binarios/" + "decimacion"; // TODO - Debe ser un path relativo, no absoluto
 	var uploads_path = "/home/jordy/node_projects/myapp/uploads/"; // TODO - Implementar el uso de la funcion path para hacer join y evitar concatenar
 
 	var resultado = {
@@ -155,8 +148,13 @@ router.post("/decimar", authEndPoint, function (req, res) {
 	comando.stdout.setEncoding('utf8');
 	comando.stderr.setEncoding('utf8');
 
+	var flag = 0;
+
 	comando.stdout.on('data', (data) => {
 		console.log(`stdout: ${data}`);
+		if (JSON.stringify(data).indexOf("entrada no valida.") >= 0 ) {
+			flag = 1;
+		}
 	});
 
 	comando.stderr.on('data', (data) => {
@@ -166,7 +164,7 @@ router.post("/decimar", authEndPoint, function (req, res) {
 	// TODO - Se debería guardar en la Base de Datos, si sí, entonces ¿cómo?
 	comando.on('close', (code) => {
 		console.log(`child process exited with code ${code}`);
-		if (code === 0) {
+		if (code === 0 && flag === 0) {
 			//resultado.destino = destino;
 			resultado.codigo = 0;
 		} 
@@ -181,77 +179,12 @@ router.post("/decimar", authEndPoint, function (req, res) {
 
 
 
-// TODO - Devolver el archivo dinámicamente
-router.get('/fileobj/:obj', authEndPoint, function (req, res) {
-	var uploads = "/home/jordy/node_projects/myapp/uploads/";
-	//var _email  = "jordy@hotmail.com";//req.user._email;
-	//var _obj    = "dd223c036a372347dfff98b4d8221bed"
-
-  	//var fileName = "/home/jordy/node_projects/myapp/uploads/jordy@hotmail.com/city.obj";
-	var fileName = uploads + req.user._email + "/decimar/" + req.params.obj;;
-
-	// TODO - Corregir
-	console.log(fileName);
-
-	if (!fileName) {
-		console.log("***GET /fileobj - No se proporcionó un fileName Válido");
-		res.end();
-		return;
-	}
-
-	var options = {
-    	headers: {
-        	'x-timestamp': Date.now(),
-        	'x-sent': true,
-        	'mimetype': "application/octet-stream",
-        	'Content-Type' : "application/octet-stream"
-    	}
-  	};
-
-	console.log(fileName);
-  	res.sendFile(fileName, options, function (err) {
-    	if (err) {
-      		console.log(err);
-      		res.status(err.status).end();
-    	}
-    	else {
-      		console.log('Sent:', fileName);
-    	}
-  	});
-});
-
 
 
 
 //req.params	- /element/:id/
 //req.body		- /element/
 //req.query		- /element?id=valor
-router.post('/rest', multer(
-	{ 
-		dest: 'uploads/',
-		limits: {
-			fieldNameSize: 100,
-			fileSize: 60000000
-		}
-	}).single("obj"), function (req, res) {
-	if (req.file) {
-		res.json(req.file);
-		console.log(req.file);
-	}
-	else {
-		res.write("Respuesta de Peticion POST\n\n");
-		params = req.body;
-		console.log(req.body);
-		console.log('\n\n')
-		//console.log(req.body.request.slice[0].origin);
-
-		for (p in params) {
-			res.write(p + "\t\t" + params[p] + "\n");
-		}
-	}
-	res.end();
-});
-
 
 
 
@@ -340,9 +273,9 @@ router.get('/signout', function(req, res) {
 
 // ******* Esta es una pagina protegida ********
 /* GET Home Page */
-router.get('/home', isAuthenticated, function(req, res){
-	res.render('home', { user: req.user });
-});
+//router.get('/home', isAuthenticated, function(req, res){
+//	res.render('home', { user: req.user });
+//});
 
 
 
