@@ -192,36 +192,8 @@ router.post("/decimar", authEndPoint, function (req, res) {
 //     PAGINAS ESTÁTICAS
 /************************************************************************************************/
 /************************************************************************************************/
-router.get("/uploadfile", function(req, res) {
-	res.render('UploadFile');
-});
-
-
-router.get("/uploadfile-js", function(req, res) {
-	fs.readFile('./public/pages/UploadFile-JS.html',function (err, data) {
-		if (err) {
-			console.log(err);
-			res.writeHead(404, {'Content-Type': 'text/html'});
-		}else{   
-			res.writeHead(200, {'Content-Type': 'text/html'});  
-			res.write(data.toString());    
-		}
-		res.end();
-	}); 	
-});
-
-
 router.get('/principal', isAuthenticated, function (req, res) {
-	fs.readFile('./public/pages/principal.html',function (err, data) {
-		if (err) {
-			console.log(err);
-			res.writeHead(404, {'Content-Type': 'text/html'});
-		}else{   
-			res.writeHead(200, {'Content-Type': 'text/html'});  
-			res.write(data.toString());    
-		}
-		res.end();
-	}); 
+	res.render("principal");
 });
 
 
