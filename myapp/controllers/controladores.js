@@ -13,16 +13,12 @@ exports.add = function (req, res) {
 
 	no_params = name && email && password;
 	empty_param = name.replace(/\s/g, "") && email.replace(/\s/g, "") && password.replace(/\s/g, "");
-	console.log("---------------------------------------");
 	console.log(no_params);
 
 	function validEmail(email) {
 	    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 	    return re.test(email);
 	}
-
-
-	console.log(req.body);
 
 	if ( typeof no_params === 'undefined' || ! empty_param ) {
 		console.log("No hay parametros");
@@ -36,7 +32,6 @@ exports.add = function (req, res) {
 		res.end();  // TODO - ¿Que deberíamos responder cuando un parametro no está setteado?
 		return;
 	}
-
 
 	// Mongoose
 	var user1 = new User({_name: name, _email: email, _password: password});
@@ -94,12 +89,15 @@ exports.user_list = function (req, res) {
 
 // POST - /upload
 exports.upload_file = function function_name(req, res) {
-	console.log(req.file);
+	String.prototype.replaceAll = function(search, replacement) {
+	    var target = this;
+	    return target.split(search).join(replacement);
+	};	
 
 	// El archivo ya ha sido guardado por Multer
 	// ahora lo metemos a la DB
 	var obj1 = new Obj({
-						_originalname: req.file.originalname, 
+						_originalname: new String(req.file.originalname).replaceAll(" ", "-"), 
 						_localname: req.file.filename, 
 						_path_and_name: req.file.path,
 						_path: req.file.destination,

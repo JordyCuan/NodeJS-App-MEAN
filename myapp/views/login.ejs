@@ -16,6 +16,10 @@
         <!-- Latest compiled and minified JavaScript -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
+        <script src="/javascripts/moduleApp.js"></script>        
+        <script src="/javascripts/controllersApp.js"></script> 
+        <script src="/javascripts/servicesApp.js"></script>
+
         <style type="text/css">
             @import url(http://fonts.googleapis.com/css?family=Roboto);
             /****** LOGIN MODAL ******/
@@ -127,27 +131,5 @@
                 </div>
             </form>
         </div>
-        <script>
-            var postApp = angular.module('appDecimation', []);
-              // Controller function and passing $http service and $scope var.
-              postApp.controller('initSession', function($scope, $http) {
-                // create a blank object to handle form data.
-                  $scope.user = {};
-                // calling our submit function.
-                  $scope.submitData = function () {
-                    $http.post("/login", $scope.user)
-                    .then( 
-                      function mySucces(response) {
-                        window.location = "/principal";
-                        //window.location = "/uploadfile-js";
-                      }, 
-                      function myError(response) {
-                        $scope.errorInitSession = "ERROR, intenta de nuevo";
-                        //window.location = "/static-index.html"
-                      }
-                    );
-                  }
-              });
-        </script>
     </body>
 </html>

@@ -1,5 +1,8 @@
+var path = require('path');
+
 function descargar(req, res, fileName) {
 	var options = {
+		root: path.join(__dirname, "../uploads/"),
 		headers: {
 			'x-timestamp': Date.now(),
 			'x-sent': true,
@@ -8,7 +11,6 @@ function descargar(req, res, fileName) {
 		}
 	};
 
-	console.log(fileName);
 	res.sendFile(fileName, options, function (err) {
 		if (err) {
 			console.log(err);
@@ -23,17 +25,17 @@ function descargar(req, res, fileName) {
 
 // GET - /file/original/:obj
 exports.desc_original = function (req, res) {
-	var uploads = "/home/jordy/node_projects/myapp/uploads/";
-	var fileName = uploads + req.user._email + "/" + req.params.obj;;
+	var uploads = "/";
+	var fileName = uploads + req.user._email + "/" + req.params.obj;
 
-	descargar(fileName);
+	descargar(req, res, fileName);
 }
 
 
 // GET - /file/decimado/:obj
 exports.desc_decimado = function (req, res) {
-	var uploads = "/home/jordy/node_projects/myapp/uploads/";
+	var uploads = "/";
 	var fileName = uploads + req.user._email + "/decimar/" + req.params.obj;;
 
-	descargar(fileName);
+	descargar(req, res, fileName);
 }

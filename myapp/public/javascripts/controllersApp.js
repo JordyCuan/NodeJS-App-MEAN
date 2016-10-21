@@ -13,7 +13,7 @@ app.controller('initSession', function($scope, $http)
           window.location = "/principal";
         }, 
         function myError(response) {
-          $scope.errorInitSession = "ERROR, intenta de nuevo";
+          $scope.errorInitSession = "Verifica tus datos e intenta de nuevo";
         }
       );
     }
@@ -23,44 +23,44 @@ app.controller('initSession', function($scope, $http)
 //CONTROLADOR PARA LA PAGINA PRINCIPAL
 app.controller('principalCtrl', function($scope, serviceObjs)
 {
-  //SE MUESTRA LA LISTA DE ARCHIVOS OBJ DEL USUARIO QUE INICIO SESION
-  var list = serviceObjs.getObjs();
-  list.then (function mySucces(response)
-  {
-    $scope.objs = response.data;
-  }, function myError(response)
-  { 
-    $scope.msgObj = "An error ocurred while show first time the obj list";
-  }
+  //Se muestra la lista de objs que tiene el usuario
+  serviceObjs.getData('/user/files')
+  .then (function mySucces(response)
+    {
+      $scope.objs = response.data;
+    }, function myError(response)
+    { 
+      $scope.msgObj = "An error ocurred while show first time the obj list";
+    }
   )
 
-  //ENVIAR ARCHIVO AL SERVIDOR
+  //Controlador para enviar un archivo al servidor
   $scope.sendFile= function ()
   {
     formData = new FormData(document.forms.namedItem("fileinfo"));
-    var completeUploadMsg = serviceObjs.uploadFile(formData)
-    completeUploadMsg.then (function mySucces(response)
-    {
-      $scope.msg = "UPLOAD SUCCESSFULL";
-      //ACTUALIZAR LA LISTA DE OBJS DEL USUARIO
-      var list = serviceObjs.getObjs();
-      list.then (function mySucces(response)
-        {
-          $scope.objs = response.data;
-        },function myError(response)
+    serviceObjs.uploadFile(formData)
+    .then (function mySucces(response)
+      {
+        $scope.msg = "UPLOAD SUCCESSFULL";
+        //Si el upload fue exitoso de actualiza la lista de objs
+        serviceObjs.getData('/user/files')
+        .then (function mySucces(response)
           {
-            $scope.msgObj = "An error ocurred while update OBJ list";
+            $scope.objs = response.data;
+          }, function myError(response)
+          { 
+            $scope.msgObj = "An error ocurred while show the obj list";
           }
-      )
+        )
       },function myError(response)
-          {
-            $scope.msg = "An error ocurred at upload file";
-          }
-      )
+      {
+        $scope.msg = "An error ocurred at upload file";
+      }
+    )
   }
 
-  //VER OBJETO ANTES DE DECIRMAR
-  $scope.decimar = function()
+  //Controlador del obj a renderizar
+  /*$scope.decimar = function()
   {
     //Recibo el identificar del archivo a previsualizar
     if ( $scope.filesObj == undefined || $scope.filesObj == null )
@@ -69,16 +69,34 @@ app.controller('principalCtrl', function($scope, serviceObjs)
     }
     else
     {
-      var idObjSelected = $scope.filesObj._originalname;
-      $scope.msgObj = idObjSelected;
+      var objSelected = $scope.filesObj._originalname;
+      //Consumme el endpoint para renderizar el obj antes de decimarlo
+      serviceObjs.getData('/file/original/'+objSelected)
+      .then(function mySucces (response)
+        {
+          $scope.msgObj = "DOWNLOAD SUCCESSFULL";
+          //Si la previsualizacion es exitosa, se manda a decimar el mismo archivo para visualizarlo posteriormente
+          serviceObjs.getData( '/file/decimado/'+objSelected)
+          .then (function mySucces(response)
+            {
+              $scope.msgObj = "El archivo decimado se descargo exitosamente";
+            }, function myError(response)
+            {
+              $scope.msgObj = "An error ocurred while downloading the file decimate";
+            }
+          )
+        }, function myError(response)
+        {
+          $scope.msgObj = "An error ocurred while download the file";
+        }
+      )
     }
-  }
+  }*/
  
 
 
 
 });
-
 
 
 
