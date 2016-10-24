@@ -34,7 +34,7 @@
 							<!-- Formulario para enviar un nuevo obj-->
 							<div>
 								<form  method="POST" enctype="multipart/form-data" name="fileinfo" ng-submit="sendFile()">
-									<input type="file" name="obj" id="file" ng-model="file">
+									<input type="file" name="obj" id="obj" ng-model="obj">
 									<input type="submit" value="Subir archivo">
 								</form>
 								<p>{{msg}}</p>
@@ -46,16 +46,16 @@
 								<select ng-model="filesObj" ng-options="x._originalname for x in objs"></select>
 								 <p>You selected: {{filesObj._originalname}}</p>
 								<input type="number" name="porcentaje" id="porcentaje" ng-model="porcentaje" min="1" max="100">
-								<!-- <button id="decimar" ng-click="decimar()">Decimar</button> -->
+								<button id="decimar" ng-click="decimar()">Decimar</button> 
 								<p>{{msgObj}}</p>
 							</div>
 							<br><br>
 							<a href="/login" class="text-center new-account">Sign Out</a>
 						</div>
 					</div>
+					<div class="container" render-obj-dir></div>
 				</div>
 			</div>
-			<div class="container" render-obj></div>
 		</div>
 	</body>
 </html>

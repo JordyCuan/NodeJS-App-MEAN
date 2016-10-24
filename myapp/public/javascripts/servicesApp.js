@@ -2,7 +2,8 @@ app.service("serviceObjs", function($http)
 {
    return({
             getData: getData,
-            uploadFile: uploadFile
+            uploadFile: uploadFile,
+            decimation: decimation
 
          });
 
@@ -20,11 +21,21 @@ app.service("serviceObjs", function($http)
    }
 
    //carga el archivo al servidor
-   function uploadFile (formdata)
+   function uploadFile (formData)
    {
       return $http.post('/upload', formData, { transformRequest: angular.identity,
                      headers: {'Content-Type': undefined}
                   }).then(function (response)
+                  {
+                     return response;
+                  });
+   }
+
+   //Servicio para la decimacion
+   function decimation(formdata)
+   {
+      return $http.post('/decimar', formdata
+                  ).then(function (response)
                   {
                      return response;
                   });

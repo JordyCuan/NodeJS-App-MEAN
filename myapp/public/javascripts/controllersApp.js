@@ -41,8 +41,8 @@ app.controller('principalCtrl', function($scope, serviceObjs)
     serviceObjs.uploadFile(formData)
     .then (function mySucces(response)
       {
-        $scope.msg = "UPLOAD SUCCESSFULL";
-        //Si el upload fue exitoso de actualiza la lista de objs
+        $scope.msg = response.data;
+        //Si el upload fue exitoso se actualiza la lista de objs
         serviceObjs.getData('/user/files')
         .then (function mySucces(response)
           {
@@ -60,38 +60,35 @@ app.controller('principalCtrl', function($scope, serviceObjs)
   }
 
   //Controlador del obj a renderizar
-  /*$scope.decimar = function()
+  $scope.decimar = function()
   {
+    var broadcast;
     //Recibo el identificar del archivo a previsualizar
-    if ( $scope.filesObj == undefined || $scope.filesObj == null )
+    if ( $scope.filesObj == undefined || $scope.filesObj == null ||
+          $scope.porcentaje == undefined || $scope.porcentaje == null )
     {
-      alert("NO HAS SELECCIONADO NADA");
+      alert("Select a file and percentage to decimation");
     }
     else
     {
-      var objSelected = $scope.filesObj._originalname;
-      //Consumme el endpoint para renderizar el obj antes de decimarlo
-      serviceObjs.getData('/file/original/'+objSelected)
-      .then(function mySucces (response)
-        {
-          $scope.msgObj = "DOWNLOAD SUCCESSFULL";
-          //Si la previsualizacion es exitosa, se manda a decimar el mismo archivo para visualizarlo posteriormente
-          serviceObjs.getData( '/file/decimado/'+objSelected)
-          .then (function mySucces(response)
-            {
-              $scope.msgObj = "El archivo decimado se descargo exitosamente";
-            }, function myError(response)
-            {
-              $scope.msgObj = "An error ocurred while downloading the file decimate";
-            }
-          )
-        }, function myError(response)
-        {
-          $scope.msgObj = "An error ocurred while download the file";
-        }
-      )
+      //Se manda a decimar el archivo
+      var form_data = {
+                  "obj"        : $scope.filesObj._originalname,
+                  "porcentaje" : $scope.porcentaje
+                };
+
+      serviceObjs.decimation(form_data)
+        .then (function mySucces(response)
+          {
+            alert("DECIMATION SUCCESSFULL");
+            $scope.$broadcast('renderObjs', $scope.filesObj._originalname);
+          }, function myError(response)
+          { 
+            $scope.msgObj = "Ocurrio un error en la decimacion";
+          }
+        )
     }
-  }*/
+  }
  
 
 

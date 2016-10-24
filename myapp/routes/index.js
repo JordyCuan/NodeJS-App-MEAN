@@ -6,7 +6,7 @@ var multer  = require('multer');
 
 var storage = multer.diskStorage({
 	destination: function (req, file, cb) {
-		console.log('*-*-*-*-*-*-*-*-*',__dirname,req.user._email);
+		console.log('*Guardando en destino:',__dirname,req.user._email);
 
 		var newDestination = 'uploads/' + req.user._email;
 		var stat = null;
@@ -21,7 +21,12 @@ var storage = multer.diskStorage({
 		cb(null, newDestination);
 	},
 	filename: function (req, file, cb) {
-		cb(null, file.originalname)
+		String.prototype.replaceAll = function(search, replacement) {
+	    	var target = this;
+	    	return target.split(search).join(replacement);
+		};
+		//cb(null, file.originalname);
+		cb(null, new String(file.originalname).replaceAll(" ", "-")   );
 	}
 });
 
@@ -63,7 +68,11 @@ var isAuthenticated = function (req, res, next) {// if user is authenticated in 
 var authEndPoint = function (req, res, next) {
 	if (req.isAuthenticated()) return next();
 
-	res.status(304).send('Not Authenticated. Log in first');
+	res.status(401).send('Not Authenticated. Log in first');
+	//http://stackoverflow.com/questions/3526805/a-distinct-http-status-for-not-logged-in-vs-not-authorized-in-a-restful-api
+	/**
+		Using 401 is for indicating that the user needs to supply credentials just as you are currently using it.
+	*/
 }
 
 

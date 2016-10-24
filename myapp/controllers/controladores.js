@@ -98,7 +98,7 @@ exports.upload_file = function function_name(req, res) {
 	// ahora lo metemos a la DB
 	var obj1 = new Obj({
 						_originalname: new String(req.file.originalname).replaceAll(" ", "-"), 
-						_localname: req.file.filename, 
+						//_localname: req.file.filename, 
 						_path_and_name: req.file.path,
 						_path: req.file.destination,
 						_encoding: req.file.encoding,
@@ -111,8 +111,10 @@ exports.upload_file = function function_name(req, res) {
 	// Guardamos el OBJ dentro de la base de datos
 	obj1.save(function (err, obj) {
 	    if (err) {
+	    	console.log("*******************ERROR 1 *******************");
 	        console.log(err);
-	        res.write(err.errmsg);
+	        res.write(err.code);
+	        res.end();
 	    } else {
 	        console.log('saved successfully:', obj);
 	        res.write("Added OBJ***");
@@ -120,8 +122,10 @@ exports.upload_file = function function_name(req, res) {
 	        // Se asocia el OBJ con el usuario que lo subio
 	        User.findOne( { _id : req.user._id } , function(err, result) {
 	        	if (err) {
+	        		console.log("*******************ERROR 2 *******************");
 					console.log(err);
 					res.write(JSON.stringify(err));
+					res.end();
 				}
 				else {
 					result._objs.push( obj1._id );

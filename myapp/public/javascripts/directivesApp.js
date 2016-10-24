@@ -1,40 +1,39 @@
-  app.directive('renderObj', function(){
+  app.directive('renderObjDir', function(){
 
 
     return {
 
       restrict: 'A',
-      scope: true,
-      template: "<input type='button' name='boton' ng-click='renderObjs()' value='RENDER'><div id='canvas'><div id='template'></div><div id='content'></div></div>",
+      //scope: true,
       link: function(scope, element, attrs){
 
-        var scenes= [],canvas, renderer, container, idAnimation, cont=0;
+        var camera, scene, renderer, material, container, idAnimation, cont=0, obj;
 
         var mouseX = 0, mouseY = 0;
 
         var windowHalfX = window.innerWidth / 2;
         var windowHalfY = window.innerHeight / 2;
 
-        scope.renderObjs = function ()
-        {
-          if ( scope.filesObj == undefined || scope.filesObj == null )
+        scope.$on('renderObjs', function (event, nameFile) {
+          /*if ( scope.filesObj == undefined || scope.filesObj == null )
           {
             alert("NO HAS SELECCIONADO ALGÚN OBJETO");
           }
           else
-          {
+          {*/
+            alert(nameFile);
             if (cont ++ >= 1)
               cleanContainer();
             var urlPrev = '/file/original/'+scope.filesObj._originalname;
             renderizado(urlPrev);
-            //var urlDec = '/file/decimado/'+scope.filesObj._originalname;
+            //var urlDec = '/file/decimado/'+nameFile;
             //renderizado(urlDec);
-          }
+          //}
 
-        }
+        });
 
 
-        function renderizado(url)
+        function renderizado(url, option)
         {
           scope.init = function()
           {
@@ -42,44 +41,33 @@
             //container = document.getElementById("objrender");
             //document.body.appendChild( container );
 
-            //container = angular.element('<div>')[0];
-            //element[0].appendChild(container);
+            container = angular.element('<div>')[0];
+            element[0].appendChild(container);
 
+            camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+            camera.position.z = 600;
 
-            canvas = document.getElementById("canvas");
-            var template = document.getElementById("template").text;
-            var content = document.getElementById("content");
+            // scene
+            scene = new THREE.Scene();
 
-            for(var i=0; i<2; i++)
-            {
-              var scene = new THREE.Scene();
-              var element = document.createElement("div");
-              element.className = "list-item";
-              element.innerHTML = template.replace ('$', i+1);
+            var ambient = new THREE.AmbientLight( 0x101030 );
+            scene.add( ambient );
 
+            var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+            directionalLight.position.set( 0, 0, 1 );
+            scene.add( directionalLight );
 
-              var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-              camera.position.z = 600;
+            // texture
+            var manager = new THREE.LoadingManager();
+            manager.onProgress = function ( item, loaded, total ) {
 
-              // scene
-              //scene = new THREE.Scene();
+              console.log( item, loaded, total );
 
-              var ambient = new THREE.AmbientLight( 0x101030 );
-              scene.add( ambient );
+            };
 
-              var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-              directionalLight.position.set( 0, 0, 1 );
-              scene.add( directionalLight );
-
-              // texture
-              var manager = new THREE.LoadingManager();
-              manager.onProgress = function ( item, loaded, total ) {
-
-                console.log( item, loaded, total );
-
-              };
-
-            //Modelo
+          //Modelo si opcion es 0
+          //if (option == 0)
+          //{
             var loader = new THREE.XHRLoader( manager );
               loader.load( url, function ( object ) 
               {
@@ -92,47 +80,81 @@
                 scene.add( obj );
 
               } );
+          //}
 
-              renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
-              renderer.setSize( window.innerWidth/2, window.innerHeight/2);
-              container.appendChild( renderer.domElement );
+          /*if(option == 1)
+          {
+              // model
+            var loader = new THREE.OBJLoader();
+            // Add a localtext parameter and an if check if url == ""
+            loader.load =   function load( url, localtext, onLoad, onProgress, onError ) {
+            var scope = this;
+            var loader = new THREE.XHRLoader( scope.manager );
+            loader.setPath( this.path );
+            loader.load( url, function ( text ) {
+              if (url==""){
+                text = localtext;
+              }
+              onLoad( scope.parse( text ) );
+              }, onProgress, onError );
+            },
 
-              document.addEventListener( 'mousemove', scope.onDocumentMouseMove, false );
+            // Now you can use either url or directly string input.
+            loader.load( '', objData, function ( object ) {
+              object.traverse( function ( child ) {
+              if ( child instanceof THREE.Mesh ) {
+                  //MORE INFORMATION
+              }
+            } );
+              
+              object.scale.x = 10;
+              object.scale.y = 10;
+              object.scale.z = 10;
+              obj = object;
+              scene.add( obj );
+            });
+          }*/
 
-              window.addEventListener( 'resize', scope.onWindowResize, false );
-              var controls = new THREE.OrbitControls(camera, renderer.domElement);
-              scenes.push (scene);
-            }
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize( window.innerWidth/2, window.innerHeight/2);
+            container.appendChild( renderer.domElement );
 
-            scope.onWindowResize = function()
-            {
-              windowHalfX = window.innerWidth / 2;
-              windowHalfY = window.innerHeight / 2;
+            document.addEventListener( 'mousemove', scope.onDocumentMouseMove, false );
 
-              camera.aspect = window.innerWidth / window.innerHeight;
-              camera.updateProjectionMatrix();
+            window.addEventListener( 'resize', scope.onWindowResize, false );
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-              renderer.setSize( window.innerWidth/2, window.innerHeight/2);
-            }
+          }
 
-            scope.onDocumentMouseMove =  function( event ) 
-            {
-              mouseX = ( event.clientX - windowHalfX ) / 2;
-              mouseY = ( event.clientY - windowHalfY ) / 2;
-            }
+          scope.onWindowResize = function()
+          {
+            windowHalfX = window.innerWidth / 2;
+            windowHalfY = window.innerHeight / 2;
 
-            scope.animate = function() 
-            {
-              idAnimation = requestAnimationFrame( scope.animate );
-              scope.render();
-            }
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
 
-            scope.render = function() 
-            {
-              renderer.render( scene, camera );
-              controls.update();
-            }
-        }
+            renderer.setSize( window.innerWidth/2, window.innerHeight/2);
+          }
+
+          scope.onDocumentMouseMove =  function( event ) 
+          {
+            mouseX = ( event.clientX - windowHalfX ) / 2;
+            mouseY = ( event.clientY - windowHalfY ) / 2;
+          }
+
+          scope.animate = function() 
+          {
+            idAnimation = requestAnimationFrame( scope.animate );
+            scope.render();
+          }
+
+          scope.render = function() 
+          {
+            renderer.render( scene, camera );
+            controls.update();
+          }
+
 
           scope.init();
           scope.animate();
@@ -150,6 +172,7 @@
             container.removeChild(container.childNodes[indice--]);
         }*/
         container.remove(angular.element('<div>')[0]);
+        breakFreeMemory();
       }
         
       //Break free memory before reload object 3D
