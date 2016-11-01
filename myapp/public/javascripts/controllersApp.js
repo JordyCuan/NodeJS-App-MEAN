@@ -1,28 +1,88 @@
-//CONTROLADOR DE INICIO DE SESSION
-
-//probar este controlador ya que es exclusivo de login.html
-app.controller('initSession', function($scope, $http) 
+//CONTROLADOR PARA EL REGISTRO E INICIO DE SESION DE USUARIOS
+app.controller('signin-signup', function($scope, serviceObjs) 
 {
-  // create a blank object to handle form data.
-    $scope.user = {};
-  // calling our submit function.
-    $scope.submitData = function () {
-      $http.post("/login", $scope.user)
+  $scope.register = false;
+  $scope.login = true;
+  $scope.newUser = {};
+  var flag = 0; 
+  
+
+    $scope.toRegister = function()
+    {
+      if (flag >= 1)
+      {
+        $scope.checkPassword = "";
+        $scope.checkEmail = "";
+        flag = 0;
+      }
+      if (serviceObjs.emailValidate($scope.newUser.email) == 1)
+      {
+        $scope.checkEmail = "Verifica tu correo electronico";
+        flag = 1;
+      }  
+      else 
+      {
+        if (serviceObjs.passwordValidate($scope.newUser.password, $scope.newUser.confirm) == 1) 
+        {
+          $scope.checkPassword = "Las contraseñas no coinciden";
+          flag = 1;
+        }
+       else
+        {
+          //Si los datos son correctos
+          serviceObjs.addUser($scope.newUser)
+          .then( 
+            function mySucces() {
+              alert("Registro exitoso");
+              //$scope.$broadcast('showPopUp', 'Registro exitoso' , 'Bienvenido');
+              $scope.newUser.name = "";
+              $scope.newUser.email = "";
+              $scope.newUser.password = "";
+              $scope.newUser.confirm = "";
+            }, 
+            function myError(response) {
+              $scope.errorInitSession = "Verifica tus datos e intenta de nuevo";
+            });
+        }
+      }
+    }
+
+
+     $scope.user = {};
+    $scope.submitData = function()
+    {
+      serviceObjs.postData($scope.user, '/login')
       .then( 
         function mySucces(response) {
           window.location = "/principal";
         }, 
         function myError(response) {
           $scope.errorInitSession = "Verifica tus datos e intenta de nuevo";
-        }
-      );
+        });
     }
+
+
+      //Ocultar formulario de registro
+$scope.showRegister = function ()
+{
+  $scope.register = true;
+  $scope.login = false;
+}
+
+$scope.showLogin = function()
+{
+  $scope.register = false;
+  $scope.login = true;
+}
 });
+
+
 
 
 //CONTROLADOR PARA LA PAGINA PRINCIPAL
 app.controller('principalCtrl', function($scope, serviceObjs)
 {
+
   //Se muestra la lista de objs que tiene el usuario
   serviceObjs.getData('/user/files')
   .then (function mySucces(response)
@@ -34,24 +94,53 @@ app.controller('principalCtrl', function($scope, serviceObjs)
     }
   )
 
-  //Controlador para enviar un archivo al servidor
+  //Scope para visualizar el obj antes de subirlo al servidor
+  $scope.renderFile = function(files)
+  {
+    //leer el contenido del archivo local para pasarlo a la directive del renderizado
+    if (files != null)
+    {
+      //opcion uno, para renderizar de manera local
+      var option = 1;
+      var file = files[0];
+      var r = new FileReader();
+      //Se lee el contenido del archivo
+      r.onload = function(e) { 
+                  objData = e.target.result;
+                  //Se pasa al directive para renderizar
+                  $scope.$broadcast('renderPrev', objData);
+            }
+            r.readAsText(file);
+          } else { 
+            alert("Failed to load file");
+    }
+
+  }
+
+  //Scope para enviar un archivo al servidor
   $scope.sendFile= function ()
   {
     formData = new FormData(document.forms.namedItem("fileinfo"));
     serviceObjs.uploadFile(formData)
     .then (function mySucces(response)
       {
-        $scope.msg = response.data;
-        //Si el upload fue exitoso se actualiza la lista de objs
-        serviceObjs.getData('/user/files')
-        .then (function mySucces(response)
-          {
-            $scope.objs = response.data;
-          }, function myError(response)
-          { 
-            $scope.msgObj = "An error ocurred while show the obj list";
-          }
-        )
+        //Si el archivo ya se encuentra en el servidor
+        if (response.data == 11000)
+          $scope.msg = "No se permiten nombres duplicados";
+
+        //En caso contrario se actualiza la lista
+        else{
+          $scope.msg = "UPLOAD SUCCESSFULL"
+          serviceObjs.getData('/user/files')
+          .then (function mySucces(response)
+            {
+              $scope.objs = response.data;
+            }, function myError(response)
+            { 
+              $scope.msgObj = "An error ocurred while show the obj list";
+            }
+        )}
+
       },function myError(response)
       {
         $scope.msg = "An error ocurred at upload file";
@@ -59,7 +148,7 @@ app.controller('principalCtrl', function($scope, serviceObjs)
     )
   }
 
-  //Controlador del obj a renderizar
+  //Scope del obj a renderizar
   $scope.decimar = function()
   {
     var broadcast;
@@ -72,12 +161,13 @@ app.controller('principalCtrl', function($scope, serviceObjs)
     else
     {
       //Se manda a decimar el archivo
-      var form_data = {
+      var formData = {
                   "obj"        : $scope.filesObj._originalname,
                   "porcentaje" : $scope.porcentaje
                 };
 
-      serviceObjs.decimation(form_data)
+      //serviceObjs.decimation(form_data)
+      serviceObjs.postData(formData, '/decimar')
         .then (function mySucces(response)
           {
             alert("DECIMATION SUCCESSFULL");
@@ -90,6 +180,8 @@ app.controller('principalCtrl', function($scope, serviceObjs)
     }
   }
  
+
+
 
 
 

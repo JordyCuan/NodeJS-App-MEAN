@@ -114,7 +114,9 @@ router.get('/file/decimado/:obj', control_descargas.desc_decimado);
 
 // Binario de Itzel
 router.post("/decimar", authEndPoint, function (req, res) {
-	var exe = "/home/jordy/node_projects/myapp/binarios/" + "decimacion"; // TODO - Debe ser un path relativo, no absoluto
+	var nombre_programa = "decimacion"
+
+	var exe = "/home/jordy/node_projects/myapp/binarios/" + nombre_programa; // TODO - Debe ser un path relativo, no absoluto
 	var uploads_path = "/home/jordy/node_projects/myapp/uploads/"; // TODO - Implementar el uso de la funcion path para hacer join y evitar concatenar
 
 	var resultado = {

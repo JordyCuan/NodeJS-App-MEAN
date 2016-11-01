@@ -113,7 +113,7 @@ exports.upload_file = function function_name(req, res) {
 	    if (err) {
 	    	console.log("*******************ERROR 1 *******************");
 	        console.log(err);
-	        res.write(err.code);
+	        res.write(JSON.stringify(err.code));
 	        res.end();
 	    } else {
 	        console.log('saved successfully:', obj);

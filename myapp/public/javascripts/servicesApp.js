@@ -3,11 +3,15 @@ app.service("serviceObjs", function($http)
    return({
             getData: getData,
             uploadFile: uploadFile,
-            decimation: decimation
+            //decimation: decimation
+            postData: postData,
+            addUser: addUser,
+            emailValidate: emailValidate,
+            passwordValidate: passwordValidate
 
          });
 
-   //consume cualquier enpoint que retorne "algo"
+   //Consume cualquier enpoint que retorne "algo"
    function getData (endpoint)
    {
       return $http({
@@ -20,7 +24,7 @@ app.service("serviceObjs", function($http)
                   });
    }
 
-   //carga el archivo al servidor
+   //Carga el archivo al servidor
    function uploadFile (formData)
    {
       return $http.post('/upload', formData, { transformRequest: angular.identity,
@@ -31,15 +35,50 @@ app.service("serviceObjs", function($http)
                   });
    }
 
-   //Servicio para la decimacion
-   function decimation(formdata)
+
+   function postData(formData, url)
    {
-      return $http.post('/decimar', formdata
+      return $http.post(url, formData
                   ).then(function (response)
                   {
                      return response;
                   });
    }
+
+  
+   function addUser(dataUser)
+   {
+      return $http.post('/signup', dataUser
+                  ).then(function (response)
+                  {
+                     return response;
+                  });
+   }
+
+   //Verificar datos
+
+   function emailValidate(email)
+   {
+         var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+         var msj ="";
+         var result = 0; //Si el correo es correcto result = 0
+         if(!re.test(email))
+            result = 1;
+        return result;    
+   }
+
+      
+
+   function passwordValidate(password, confirm)
+   {
+      var result = 0; //Si las contraseñas coinciden result = 0
+      if(password != confirm)
+         result = 1;
+      return result;
+
+   }
+
+
 
    //Manejadores de errores
    function handleError( response ) 

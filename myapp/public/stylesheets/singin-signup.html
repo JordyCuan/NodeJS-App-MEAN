@@ -9,12 +9,11 @@
     <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.js"></script>
-    <script src="http://threejs.org/build/three.min.js"></script>
 
     <link rel="stylesheet" type="text/css" href="stylesheets/signin-singup-style.css">
 
     <script src="/javascripts/moduleApp.js"></script> 
-    <!-- <script src="/javascripts/directiveOcioso.js"></script> -->
+    <script src="/javascripts/directiveRender.js"></script>
     <script src="/javascripts/directivePopUp.js"></script>        
     <script src="/javascripts/controllersApp.js"></script>
     <script src="/javascripts/servicesApp.js"></script>
@@ -30,11 +29,11 @@
     <!-- Quiero que se visualize un pupop desde una directiva pero no funciona
     <div pop-up></div> -->
 
-    <div class="container-fluid" ng-controller="signin-signup">
+    <div class="container-fluid">
     <!-- Formulario para el registro -->
-      <div class="col-md-6" id="sign-up" ng-show="register">
+      <div class="col-md-6" id="sign-up" >
         <div id="logbox">
-          <form name="register" id="register" ng-submit="toRegister()">
+          <form name="register" id="register" ng-controller="registerUser" ng-submit="toRegister()">
             <h1>Registro</h1>
             <input ng-model="newUser.name" type="text" placeholder="Nombre" pattern="[a-zA-Z]{4,30}" autofocus="autofocus" required="required" class="input pass"/>
             <input ng-model="newUser.password" type="password" placeholder="Ingresa una contraseña" required="required" class="input pass"/>
@@ -45,15 +44,15 @@
             <input type="submit" value="Registrarse" class="inputButton"/>
           </form>
             <div class="text-center">
-                ¿Ya estas registrado? <a href="" ng-click='showLogin()'>Iniciar sesion</a>
+                ¿Ya estas registrado? <a href="#" id="login">Iniciar sesion</a>
             </div>
         </div>
       </div>
     
       <!-- Formulario para iniciar sesion -->
-      <div class="col-md-6" id="sign-in" ng-show="login">
+      <div class="col-md-6" id="sign-in">
         <div id="logbox">
-          <form  ng-submit="submitData()">
+          <form  ng-controller="login" ng-submit="submitData()">
             <h1>Inicio de sesión</h1>
             <input ng-model="user.email" type="email" placeholder="Ingresa tu correo electronico" class="input pass"/>
             <input ng-model="user.password" type="password" placeholder="Ingresa tu contraseña" required="required" class="input pass"/>
@@ -61,13 +60,13 @@
             <p>{{errorInitSession}}</p>
           </form>
           <div class="text-center"">
-            <a href="" ng-click='showRegister()'>Registrarse</a> - <a href="" id="signin">¿Has olvidado tu contraseña?</a>
+            <a id="">Registrarse</a> - <a href="#" id="">¿Has olvidado tu contraseña?</a>
           </div>
         </div>
       </div>
 
       <!-- Renderizado de un obj sencillo -->
-      <!-- <canvas render-figures></canvas> -->
+      <canvas render-figures></canvas>
 
     </div>
 

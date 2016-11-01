@@ -4,45 +4,53 @@
     return {
 
       restrict: 'A',
-      //scope: true,
+      template: "<div id='container'><canvas id='canvasPr' width='200' height='200'></canvas><canvas id='canvasPo'></div></div>",
       link: function(scope, element, attrs){
 
-        var camera, scene, renderer, material, container, idAnimation, cont=0, obj;
+        var cameraPost, scenePost, rendererPost, container, idAnimationPost, cont=0, objPost, flagPost = 0;
+        var cameraPrev, scenePrev, rendererPrev, idAnimationPrev, objPrev, flagPrev= 0;
 
         var mouseX = 0, mouseY = 0;
 
         var windowHalfX = window.innerWidth / 2;
         var windowHalfY = window.innerHeight / 2;
 
-        scope.$on('renderObjs', function (event, nameFile) {
-          /*if ( scope.filesObj == undefined || scope.filesObj == null )
+        container = document.getElementById("container");
+
+
+        //Render Previo ya sea antes de upload o de la lista
+        scope.$on('renderPrev', function (event, nameFile, option){
+          if (flagPrev == 1)
           {
-            alert("NO HAS SELECCIONADO ALGÚN OBJETO");
+            cleanContainer(cameraPrev, scenePrev, rendererPrev);
+            flagPrev = 0;
           }
           else
-          {*/
-            alert(nameFile);
+          {
+            var canvas = document.getElementById("canvasPr");
+            renderizado(nameFile, cameraPrev, scenePrev, rendererPrev, canvas);
+            flagPrev = 1;
+          }
+        });
+
+
+
+        scope.$on('renderPost', function (event, nameFile, option) {
             if (cont ++ >= 1)
               cleanContainer();
-            var urlPrev = '/file/original/'+scope.filesObj._originalname;
-            renderizado(urlPrev);
+            //var urlPrev = '/file/original/'+scope.filesObj._originalname;
+            //renderizado(urlPrev);
             //var urlDec = '/file/decimado/'+nameFile;
             //renderizado(urlDec);
-          //}
+            renderizado(nameFile);
 
         });
 
 
-        function renderizado(url, option)
+        function renderizado(nameFile, camera, scene, renderer, canvas)
         {
           scope.init = function()
           {
-
-            //container = document.getElementById("objrender");
-            //document.body.appendChild( container );
-
-            container = angular.element('<div>')[0];
-            element[0].appendChild(container);
 
             camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
             camera.position.z = 600;
@@ -66,10 +74,10 @@
             };
 
           //Modelo si opcion es 0
-          //if (option == 0)
-          //{
+          /*if (option == 0)
+          {
             var loader = new THREE.XHRLoader( manager );
-              loader.load( url, function ( object ) 
+              loader.load( nameFile, function ( object ) 
               {
                 var objLoader = new THREE.OBJLoader();
                 objLoader = objLoader.parse(object);
@@ -80,10 +88,10 @@
                 scene.add( obj );
 
               } );
-          //}
+          }*/
 
-          /*if(option == 1)
-          {
+          //if(option == 1)
+          //{
               // model
             var loader = new THREE.OBJLoader();
             // Add a localtext parameter and an if check if url == ""
@@ -100,7 +108,7 @@
             },
 
             // Now you can use either url or directly string input.
-            loader.load( '', objData, function ( object ) {
+            loader.load( '', nameFile, function ( object ) {
               object.traverse( function ( child ) {
               if ( child instanceof THREE.Mesh ) {
                   //MORE INFORMATION
@@ -113,9 +121,9 @@
               obj = object;
               scene.add( obj );
             });
-          }*/
+          //}
 
-            renderer = new THREE.WebGLRenderer();
+            var renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
             renderer.setSize( window.innerWidth/2, window.innerHeight/2);
             container.appendChild( renderer.domElement );
 
@@ -171,7 +179,6 @@
           while (indice > 0)
             container.removeChild(container.childNodes[indice--]);
         }*/
-        container.remove(angular.element('<div>')[0]);
         breakFreeMemory();
       }
         
