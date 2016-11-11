@@ -1,15 +1,26 @@
 app.service("serviceObjs", function($http)
 {
    return({
+            initSession: initSession,
             getData: getData,
             uploadFile: uploadFile,
-            //decimation: decimation
             postData: postData,
             addUser: addUser,
             emailValidate: emailValidate,
-            passwordValidate: passwordValidate
+            passwordValidate: passwordValidate,
 
          });
+
+
+//iniciar Session
+   function initSession(formData)
+   {
+      return $http.post('/login', formData
+                  ).then(function (response)
+                  {
+                     return response;
+                  });
+   }
 
    //Consume cualquier enpoint que retorne "algo"
    function getData (endpoint)
@@ -96,6 +107,63 @@ app.service("serviceObjs", function($http)
    }
 
 
+});	//End de service('serviceObjs'...)
 
 
-});	
+
+//service de control de cookies del usuario
+app.service("userCookies", ["$cookies", function($cookieStore, $location, $http){
+   return({
+      login: login,
+      logout: logout,
+      getName: getName,
+      checkStatus: checkStatus
+
+   });
+
+
+   function login(username)
+   {
+      userName  = username;
+      $cookieStore.put('userName', username);
+   }
+
+   function logout()
+   {
+      userName = "";
+      $cookieStore.remove('userName');
+      return $http({
+                     method: 'GET',
+                     url: '/signout',
+                  })
+                  .then(function (data)
+                  { 
+                     return data;
+                  });
+
+   }
+
+   function getName()
+   {
+      return $cookieStore.get('userName');
+   }
+
+   function checkStatus()
+   {
+      var privatePaths= ['/principal'];
+      if($cookies.get('userName') == null)
+      {
+         $location.path("/login");
+      }
+
+      if($cookies.get('userName') != "undefined")
+      {
+         $location.path("/principal");
+      }
+
+      return(location.path());
+   }
+
+
+
+   }]);

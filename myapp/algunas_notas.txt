@@ -14,30 +14,6 @@ https://github.com/tutsplus/passport-mongo/blob/master/passport/signup.js
 
 
 
-SOBRE ANGULAR
-
-Usar angular reducir el código del servidor
-
-Angular sirve para diseño de SPA (single-page application)
-
-Se puede usar AngularJS dentro de los templates (JADE / EJS), o bien, no usar templates y desde NodeJS devolver páginas estáticas
-
-
-
-
-
-AUTENTICACIÓN CON ANGULARJS:
-
-Bueno:  https://www.sitepoint.com/implementing-authentication-angular-applications/
-
-https://devdactic.com/user-auth-angularjs-ionic/
-
-http://www.tutorialspoint.com/angularjs/angularjs_login_application.htm
-
-http://jasonwatmore.com/post/2015/03/10/AngularJS-User-Registration-and-Login-Example.aspx
-
-
-
 
 SUBIR ARCHIVOS AL SERVER:
 

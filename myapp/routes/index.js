@@ -114,7 +114,7 @@ router.get('/file/decimado/:obj', control_descargas.desc_decimado);
 
 // Binario de Itzel
 router.post("/decimar", authEndPoint, function (req, res) {
-	var nombre_programa = "decimacion"
+	var nombre_programa = "prueba"
 
 	var exe = "/home/jordy/node_projects/myapp/binarios/" + nombre_programa; // TODO - Debe ser un path relativo, no absoluto
 	var uploads_path = "/home/jordy/node_projects/myapp/uploads/"; // TODO - Implementar el uso de la funcion path para hacer join y evitar concatenar
@@ -248,19 +248,6 @@ router.get('/signout', function(req, res) {
 	req.logout();
 	res.redirect('/');
 });
-
-
-
-
-
-// ******* Esta es una pagina protegida ********
-/* GET Home Page */
-//router.get('/home', isAuthenticated, function(req, res){
-//	res.render('home', { user: req.user });
-//});
-
-
-
 
 
 module.exports = router;

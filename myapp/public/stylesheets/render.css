@@ -1,0 +1,15 @@
+#canvasPrevio{
+	position: fixed;
+	left: 0px;
+	width: 400px;
+	height: 400px;
+	border: 2;
+}
+
+#canvasPost{
+	position: fixed;
+	left: 0px;
+	width: 400px;
+	height: 400px;
+	border: 2;
+}

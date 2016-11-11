@@ -8,31 +8,29 @@
     <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
     <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.js"></script>
-    <script src="http://threejs.org/build/three.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-cookies.js" type="text/javascript"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-route.js" type="text/javascript"></script>
 
     <link rel="stylesheet" type="text/css" href="stylesheets/signin-singup-style.css">
 
-    <script src="/javascripts/moduleApp.js"></script> 
-    <!-- <script src="/javascripts/directiveOcioso.js"></script> -->
-    <script src="/javascripts/directivePopUp.js"></script>        
+    <script src="/javascripts/moduleApp.js"></script>        
     <script src="/javascripts/controllersApp.js"></script>
     <script src="/javascripts/servicesApp.js"></script>
+    <!-- <script src="/javascripts/factoryInnitSession.js"></script> -->
 
 
   </head>
-  <body ng-app="appDecimation">
+  <body ng-app="appDecimation" >
 
     <div class="page-header">
       <h1>DECIMACION DE OBJETOS 3D</h1>
     </div>
 
-    <!-- Quiero que se visualize un pupop desde una directiva pero no funciona
-    <div pop-up></div> -->
-
     <div class="container-fluid" ng-controller="signin-signup">
     <!-- Formulario para el registro -->
-      <div class="col-md-6" id="sign-up" ng-show="register">
+      <div class="col-md-6" id="sign-up" ng-show="register" >
         <div id="logbox">
           <form name="register" id="register" ng-submit="toRegister()">
             <h1>Registro</h1>
@@ -45,13 +43,13 @@
             <input type="submit" value="Registrarse" class="inputButton"/>
           </form>
             <div class="text-center">
-                ¿Ya estas registrado? <a href="" ng-click='showLogin()'>Iniciar sesion</a>
+                ¿Ya estas registrado? <a href="" id="login" ng-click='showLogin()'>Iniciar sesion</a>
             </div>
         </div>
       </div>
     
       <!-- Formulario para iniciar sesion -->
-      <div class="col-md-6" id="sign-in" ng-show="login">
+      <div class="col-md-6" id="sign-in" ng-show="login" >
         <div id="logbox">
           <form  ng-submit="submitData()">
             <h1>Inicio de sesión</h1>
@@ -61,14 +59,10 @@
             <p>{{errorInitSession}}</p>
           </form>
           <div class="text-center"">
-            <a href="" ng-click='showRegister()'>Registrarse</a> - <a href="" id="signin">¿Has olvidado tu contraseña?</a>
+            <a id="" ng-click='showRegister()' >Registrarse</a> - <a href="#" id="">¿Has olvidado tu contraseña?</a>
           </div>
         </div>
       </div>
-
-      <!-- Renderizado de un obj sencillo -->
-      <!-- <canvas render-figures></canvas> -->
-
     </div>
 
 </body>

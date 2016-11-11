@@ -1,18 +1,26 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html >
   <head>
-    <title>HOME</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular-animate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular-sanitize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.2.0/ui-bootstrap-tpls.js"></script>
 
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.3.2/bootstrap-slider.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.3.5/js/fileinput.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.3.5/css/fileinput.min.css">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js" type="text/javascript"></script> 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular-route.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-cookies.js" type="text/javascript"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-route.js" type="text/javascript"></script>
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-filestyle/1.2.1/bootstrap-filestyle.min.js"></script>
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.2.0/ui-bootstrap.min.js" type="text/javascript" ></script>
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/principal.css">
 
     <script src="http://threejs.org/build/three.min.js"></script>
     <script src="http://threejs.org/examples/js/loaders/OBJLoader.js"></script>
@@ -21,56 +29,110 @@
     <script src="http://threejs.org/examples/js/libs/stats.min.js"></script>
     
     <script src="/javascripts/moduleApp.js"></script> 
-    <script src="/javascripts/directiveRender.js"></script>        
+    <script src="/javascripts/directiveR.js"></script>        
     <script src="/javascripts/controllersApp.js"></script>
-    <script src="/javascripts/servicesApp.js"></script> 
-
-    <link rel="stylesheet" type="text/css" href="stylesheets/home.css">
+    <script src="/javascripts/servicesApp.js"></script>
+    <!-- <script src="/javascripts/factoryInnitSession.js"></script> -->
 
   </head>
   <body ng-app="appDecimation" ng-controller="principalCtrl">
 
-  	<div class="page-header">
-      <h1>DECIMACION DE OBJETOS 3D</h1>
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand navbar-brand-centered" href="#">DECIMACIÓN</a>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="/signout" ng-click="logout()"><span class="glyphicon glyphicon-log-in"></span> Salir</a></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+    <div class="container">
+      <div class="row well ">
+
+      <!-- Se muestran las listas de los obj y barra buscar -->
+        <div class="col-md-3">
+          <h4>Lista de archivos OBJ</h4>
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Buscar" ng-model="selected" uib-typeahead="objs._originalname for objs in objs | filter:$viewValue | limitTo:8"  />
+            <span class="input-group-btn">
+                <button class="btn btn-info" type="button">
+                    <i class="glyphicon glyphicon-search"></i>
+                </button>
+            </span>
+          </div>
+          <select multiple class="form-control" ng-model="selectedObj">
+                <option ng-repeat="objs in objs" >{{objs._originalname}}</option>
+          </select>
+        </div> <!-- END class="col-md-3 -->
+
+        <div class="col-md-6 ">
+        <h4></h4>
+          <!-- Grupo para subir archivo -->
+          <div class="form-group">
+            <form class="form-inline" method="POST" enctype="multipart/form-data" name="fileinfo" >
+              <div class="form-group">          
+                <label class="control-label">Elige un archivo obj</label>
+                <input type="file" class="filestyle" name="obj" id="obj" ng-model="obj" onchange="angular.element(this).scope().renderFile(this.files)">
+              </div>
+            </form>
+
+          </div> <!-- END subir archivo -->
+
+        
+
+        <!-- DEcimacion de obj -->
+          <div class="input-group">
+            <label class="control-label">Porcentaje de decimación</label>
+            <div class="input-group" id="percentage">
+
+              <input type="text" name="quant[2]" class="form-control input-number" min="1" max="100" ng-model="porcentaje">
+
+              <span class="input-group-btn btn-toolbar">
+                <button type="button" class="btn btn-primary" id="decimate" ng-click="decimate()">Decimar</button>
+              </span>
+            </div>
+          </div> <!-- input group -->
+            
+        </div> <!--  end col-md-6 -->
+
+          <div class="col-md-3">
+          <h4>Avisos</h4>
+            <textarea class="form-control" rows="8" ng-model="msg" id="consola" ng-init="showDataUSer()" disabled ></textarea>
+          </div>
+
+
+
+        <br><br><br>
+
+    </div> <!-- end row -->
+
+    <div class="row well">
+      <div class="container-fluid">
+
+      <div class="col-md-5 col-md-offset-1">
+        <h4 id="modeloOrig">Modelo Original</h4>
+        <div  render-obj-prev id="renderPrev"></div>
+      </div>
+      <div class="col-md-5 col-md-offset-1">
+        <h4 id="modeloDec">Modelo Decimado</h4>
+        <div class="col-md-5 col-md-offset-1" render-obj-post id="renderPost"></div>
+      </div>
+
+      </div>
     </div>
 
-    <div class="container-fluid">
-    <a class="btn btn-primary" href="/login" role="button">Salir</a>
-      <div class="col-md-3">
-
-        <div class="panel">
-          <div class="panel-heading">Lista de Archivos OBJ</a></div>
-            <div class="panel-body">
-              <div class="list-group" data-size="5">
-                <a ng-repeat="x in objs" ng-href="#" class="list-group-item">
-                  <div>{{x._originalname}}</div>
-                </a>
-              </div>
-            </div>
-        </div>
-    	</div>
-    	
-    
-      <div class="col-md-6 col-md-offset-2">
-    		<form  class="form-inline" method="POST" enctype="multipart/form-data" name="fileinfo" ng-submit="sendFile()">
-  				<div class="form-group">
-  						<input type="file" name="obj" id="obj" ng-model="obj" onchange="angular.element(this).scope().renderFile(this.files)">
-  				</div>
-  				<button type="submit" class="btn btn-primary">Cargar Archivo</button>
-  			</form>
-  			<p>{{msg}}</p>
-  	  </div>
-
-
-  	<div class="col-md-6 col-md-offset-2">
-  		<input type="number" name="porcentaje" id="porcentaje" ng-model="porcentaje" min="1" max="100">
-		<button id="decimar" ng-click="decimar()" class="btn btn-primary">Decimar</button> 
-  	</div>
-  	<div class="container" render-obj-dir></div>
-
-    </div> <!-- END container-fluid -->
-
+    </div> <!-- en container -->
 
 
   </body>
-</html
+</html>
